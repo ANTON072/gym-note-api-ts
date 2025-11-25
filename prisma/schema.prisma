@@ -1,0 +1,58 @@
+// Prismaスキーマファイル
+// データベースモデルの定義
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザーモデル（Firebase UIDと紐付け）
+model User {
+  id        String   @id @default(cuid())
+  firebaseUid String @unique @map("firebase_uid")
+  email     String?
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workoutLogs WorkoutLog[]
+
+  @@map("users")
+}
+
+// 筋トレログモデル
+model WorkoutLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  date      DateTime
+  note      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises Exercise[]
+
+  @@map("workout_logs")
+}
+
+// エクササイズモデル
+model Exercise {
+  id           String   @id @default(cuid())
+  workoutLogId String   @map("workout_log_id")
+  name         String
+  sets         Int
+  reps         Int
+  weight       Float?
+  note         String?  @db.Text
+  order        Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  workoutLog   WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+
+  @@map("exercises")
+}
