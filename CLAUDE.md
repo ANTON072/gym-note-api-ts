@@ -59,6 +59,13 @@ gym-note-api-ts/
 | `npm run prisma:generate` | Prismaクライアント生成        |
 | `npm run prisma:migrate`  | マイグレーション実行          |
 
+## ローカル開発環境のセットアップ
+
+1. `.env.example`をコピーして`.env`を作成
+2. `docker compose up -d`でMySQLコンテナを起動
+3. `npm run prisma:migrate`でマイグレーション実行
+4. `npm run dev`で開発サーバー起動
+
 ## テストガイドライン
 
 - **テスト対象:** API エンドポイント、データベース操作、ビジネスロジック
