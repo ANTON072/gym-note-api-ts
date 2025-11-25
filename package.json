@@ -1,8 +1,6 @@
 {
   "name": "gym-note-api",
-  "version": "1.0.0",
-  "description": "筋トレのログを記録するノートアプリのAPI",
-  "main": "dist/index.js",
+  "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -16,16 +14,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
   },
-  "keywords": [
-    "gym",
-    "workout",
-    "fitness",
-    "api"
-  ],
-  "author": "",
-  "license": "ISC",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
