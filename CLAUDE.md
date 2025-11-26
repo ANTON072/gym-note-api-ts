@@ -104,17 +104,128 @@ model User {
 
 ```typescript
 // 推奨
-z.email()
-z.url()
+z.email();
+z.url();
 
 // 非推奨
-z.string().email()
-z.string().url()
+z.string().email();
+z.string().url();
 ```
 
 ### コメント
 
 - 各ファイルの冒頭には日本語のコメントで仕様を記述する
+
+### API レスポンス規約
+
+#### エラーレスポンス
+
+エラー発生時は HTTP ステータスコードとともに、以下の形式でレスポンスを返す。
+
+```typescript
+{
+  "error": {
+    "code": string,      // 内部エラーコード（例: "VALIDATION_ERROR"）
+    "message": string,   // エラーメッセージ
+    "details"?: object   // サービス毎の詳細エラー情報（任意）
+  }
+}
+```
+
+**内部エラーコード一覧:**
+
+| HTTP ステータス | code             | 説明                   |
+| --------------- | ---------------- | ---------------------- |
+| 400             | VALIDATION_ERROR | リクエストの形式が不正 |
+| 401             | UNAUTHORIZED     | 認証エラー             |
+| 403             | FORBIDDEN        | アクセス権限なし       |
+| 404             | NOT_FOUND        | リソースが見つからない |
+| 500             | INTERNAL_ERROR   | サーバー内部エラー     |
+
+**例: 基本的なエラーレスポンス**
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "指定されたリソースが見つかりません"
+  }
+}
+```
+
+**例: 詳細情報を含むバリデーションエラー**
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "入力内容に誤りがあります",
+    "details": {
+      "fields": [
+        {
+          "field": "email",
+          "message": "メールアドレスの形式が正しくありません"
+        },
+        { "field": "name", "message": "名前は必須です" }
+      ]
+    }
+  }
+}
+```
+
+**例: 外部サービスエラーの詳細**
+
+```json
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "外部サービスとの通信に失敗しました",
+    "details": {
+      "service": "firebase",
+      "originalError": "auth/user-not-found"
+    }
+  }
+}
+```
+
+#### ページングレスポンス
+
+一覧取得 API でページングが必要な場合、レスポンスに `paging` オブジェクトを含める。
+
+```typescript
+{
+  "items": [...],        // データ配列（キー名はリソースに応じて変更）
+  "paging": {
+    "total": number,     // 総件数
+    "offset": number,    // 現在の開始位置
+    "limit": number      // 1ページあたりの取得件数（固定値）
+  }
+}
+```
+
+**リクエストパラメータ:**
+
+| パラメータ | 型     | 説明                                |
+| ---------- | ------ | ----------------------------------- |
+| offset     | number | 取得を開始する位置（デフォルト: 0） |
+
+※ `limit` はサーバー側の固定値（20）とし、クライアントからは指定しない。
+
+**例: ページングレスポンス**
+
+```json
+{
+  "workouts": [
+    { "id": "cuid1", "place": "ジム" },
+    { "id": "cuid2", "place": "自宅" }
+  ],
+  "paging": {
+    "total": 100,
+    "offset": 0,
+    "limit": 20
+  }
+}
+```
 
 ### テスト
 
