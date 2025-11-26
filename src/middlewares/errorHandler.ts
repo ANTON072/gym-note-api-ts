@@ -5,12 +5,29 @@
 import { Request, Response, NextFunction } from "express";
 
 /**
+ * 内部エラーコード
+ */
+export type ErrorCode =
+  | "VALIDATION_ERROR"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "INTERNAL_ERROR";
+
+/**
+ * エラー詳細の型定義
+ */
+export type ErrorDetails = Record<string, unknown>;
+
+/**
  * アプリケーションエラークラス
  */
 export class AppError extends Error {
   constructor(
     public statusCode: number,
-    public message: string
+    public code: ErrorCode,
+    public override message: string,
+    public details?: ErrorDetails
   ) {
     super(message);
     this.name = "AppError";
@@ -35,7 +52,9 @@ export function errorHandler(
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       error: {
+        code: err.code,
         message: err.message,
+        ...(err.details && { details: err.details }),
       },
     });
     return;
@@ -43,6 +62,7 @@ export function errorHandler(
 
   res.status(500).json({
     error: {
+      code: "INTERNAL_ERROR",
       message: "Internal Server Error",
     },
   });

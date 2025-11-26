@@ -32,7 +32,7 @@ export async function authMiddleware(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new AppError(401, "認証トークンが必要です");
+      throw new AppError(401, "UNAUTHORIZED", "認証トークンが必要です");
     }
 
     const token = authHeader.split("Bearer ")[1];
@@ -44,6 +44,6 @@ export async function authMiddleware(
       next(error);
       return;
     }
-    next(new AppError(401, "無効な認証トークンです"));
+    next(new AppError(401, "UNAUTHORIZED", "無効な認証トークンです"));
   }
 }
