@@ -8,9 +8,9 @@ DOMAIN="api.gym-note.net"
 
 echo "=== サーバー初期セットアップ開始 ==="
 
-# Node.js 22 のインストール
+# Node.js 22 のインストール（NodeSourceリポジトリを使用）
 echo ">>> Node.js 22 をインストール中..."
-sudo dnf module enable nodejs:22 -y
+curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
 sudo dnf install -y nodejs
 node -v
 
