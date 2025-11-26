@@ -7,6 +7,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { errorHandler } from "./middlewares/errorHandler";
 import healthRouter from "./routes/health";
+import userRouter from "./routes/user";
 
 const app: Application = express();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ルートの設定
 app.use("/health", healthRouter);
+app.use("/api/v1/user", userRouter);
 
 // エラーハンドリング
 app.use(errorHandler);

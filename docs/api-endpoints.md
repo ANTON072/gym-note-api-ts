@@ -19,13 +19,15 @@
 
 ```json
 {
-  "id": "cuid",
-  "firebaseUid": "firebase_uid",
-  "email": "user@example.com",
-  "name": "ユーザー名",
-  "imageUrl": "https://example.com/image.jpg",
-  "createdAt": "2024-01-15T10:00:00.000Z",
-  "updatedAt": "2024-01-15T10:00:00.000Z"
+  "user": {
+    "id": "cuid",
+    "firebaseUid": "firebase_uid",
+    "email": "user@example.com",
+    "name": "ユーザー名",
+    "imageUrl": "https://example.com/image.jpg",
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "updatedAt": "2024-01-15T10:00:00.000Z"
+  }
 }
 ```
 
