@@ -33,6 +33,7 @@ model Workout {
   performedEndAt   DateTime? @map("performed_end_at")
   place            String?
   note             String?
+  deletedAt        DateTime? @map("deleted_at")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
@@ -43,13 +44,14 @@ model Workout {
 }
 
 model Exercise {
-  id         String   @id @default(cuid())
-  userId     String   @map("user_id")
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
   name       String
-  bodyPart   Int?     @map("body_part")
-  laterality Int?     @map("laterality")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  bodyPart   Int?      @map("body_part")
+  laterality Int?      @map("laterality")
+  deletedAt  DateTime? @map("deleted_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   user             User              @relation(fields: [userId], references: [id])
   workoutExercises WorkoutExercise[]
@@ -65,8 +67,8 @@ model WorkoutExercise {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  workout     Workout      @relation(fields: [workoutId], references: [id])
-  exercise    Exercise     @relation(fields: [exerciseId], references: [id])
+  workout     Workout      @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise    Exercise     @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
   workoutSets WorkoutSet[]
 
   // 同じworkoutに同じexerciseは1回のみ追加が可能
@@ -84,7 +86,7 @@ model WorkoutSet {
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
-  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id])
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
 
   @@map("workout_sets")
 }

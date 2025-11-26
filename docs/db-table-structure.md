@@ -73,6 +73,7 @@ erDiagram
         datetime performed_end_at
         varchar place
         text note
+        datetime deleted_at
     }
 
     exercises {
@@ -81,6 +82,7 @@ erDiagram
         varchar name
         int body_part
         int laterality
+        datetime deleted_at
     }
 
     workout_exercises {
@@ -102,15 +104,15 @@ erDiagram
 
 ## users（ユーザー）
 
-| カラム名     | 型           | 制約     | 説明                      |
-| ------------ | ------------ | -------- | ------------------------- |
-| id           | CUID         | PK       | 主キー（自動生成）        |
-| firebase_uid | VARCHAR(255) | UNIQUE   | Firebase UID              |
-| email        | VARCHAR(255) |          | メールアドレス            |
-| name         | VARCHAR(255) |          | ユーザー名                |
-| image_url    | VARCHAR(255) |          | プロフィール画像          |
-| created_at   | DATETIME     | NOT NULL | 作成日時                  |
-| updated_at   | DATETIME     | NOT NULL | 更新日時                  |
+| カラム名     | 型           | 制約     | 説明               |
+| ------------ | ------------ | -------- | ------------------ |
+| id           | CUID         | PK       | 主キー（自動生成） |
+| firebase_uid | VARCHAR(255) | UNIQUE   | Firebase UID       |
+| email        | VARCHAR(255) |          | メールアドレス     |
+| name         | VARCHAR(255) |          | ユーザー名         |
+| image_url    | VARCHAR(255) |          | プロフィール画像   |
+| created_at   | DATETIME     | NOT NULL | 作成日時           |
+| updated_at   | DATETIME     | NOT NULL | 更新日時           |
 
 ---
 
@@ -124,6 +126,7 @@ erDiagram
 | performed_end_at   | DATETIME     |             | トレーニング終了時刻 |
 | place              | VARCHAR(255) |             | 場所                 |
 | note               | TEXT         |             | メモ                 |
+| deleted_at         | DATETIME     |             | 論理削除日時         |
 | created_at         | DATETIME     | NOT NULL    | 作成日時             |
 | updated_at         | DATETIME     | NOT NULL    | 更新日時             |
 
@@ -140,6 +143,7 @@ erDiagram
 | name       | VARCHAR(255) | NOT NULL    | 種目名                       |
 | body_part  | INTEGER      |             | 部位（enum: 胸、背中など）   |
 | laterality | INTEGER      |             | 左右区分（enum: 両側、片側） |
+| deleted_at | DATETIME     |             | 論理削除日時                 |
 | created_at | DATETIME     | NOT NULL    | 作成日時                     |
 | updated_at | DATETIME     | NOT NULL    | 更新日時                     |
 
@@ -169,14 +173,14 @@ erDiagram
 
 トレーニング日と種目の中間テーブル。その日に行った種目を記録。
 
-| カラム名    | 型       | 制約        | 説明             |
-| ----------- | -------- | ----------- | ---------------- |
-| id          | CUID     | PK          | 主キー（自動生成）|
-| workout_id  | CUID     | FK NOT NULL | トレーニング日ID |
-| exercise_id | CUID     | FK NOT NULL | 種目ID           |
-| order_index | INTEGER  | NOT NULL    | 表示順           |
-| created_at  | DATETIME | NOT NULL    | 作成日時         |
-| updated_at  | DATETIME | NOT NULL    | 更新日時         |
+| カラム名    | 型       | 制約        | 説明               |
+| ----------- | -------- | ----------- | ------------------ |
+| id          | CUID     | PK          | 主キー（自動生成） |
+| workout_id  | CUID     | FK NOT NULL | トレーニング日ID   |
+| exercise_id | CUID     | FK NOT NULL | 種目ID             |
+| order_index | INTEGER  | NOT NULL    | 表示順             |
+| created_at  | DATETIME | NOT NULL    | 作成日時           |
+| updated_at  | DATETIME | NOT NULL    | 更新日時           |
 
 ### 複合ユニーク制約
 
@@ -197,4 +201,3 @@ erDiagram
 | reps                | INTEGER  |             | 回数               |
 | created_at          | DATETIME | NOT NULL    | 作成日時           |
 | updated_at          | DATETIME | NOT NULL    | 更新日時           |
-
