@@ -87,6 +87,10 @@ gym-note-api-ts/
 - **ドキュメント:** 関数には JSDoc コメントを必ず追加
 - 規約: ハードコード禁止。環境変数や設定ファイルを利用し、柔軟に対応できるようにします。
 
+## ドキュメント
+
+- [DB テーブル設計](docs/db-table-structure.md)
+
 ## 参考リンク
 
 - [Express \- Node\.js web application framework](https://expressjs.com/)
