@@ -8,6 +8,10 @@ DOMAIN="api.gym-note.net"
 
 echo "=== サーバー初期セットアップ開始 ==="
 
+# 基本ツールのインストール
+echo ">>> 基本ツールをインストール中..."
+sudo dnf install -y vim
+
 # EPELリポジトリを有効化（certbot等に必要）
 echo ">>> EPELリポジトリを有効化中..."
 sudo dnf install -y epel-release
