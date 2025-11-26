@@ -3,7 +3,7 @@ import { exerciseSchema } from "./exercise";
 
 export const workoutSetSchema = z.object({
   id: z.string(),
-  weight: z.number().min(0).nullable(),
+  weight: z.number().int().min(0).nullable(),
   reps: z.number().int().min(0).nullable(),
 });
 

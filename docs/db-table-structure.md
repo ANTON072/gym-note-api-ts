@@ -197,7 +197,7 @@ erDiagram
 | ------------------- | -------- | ----------- | ------------------ |
 | id                  | CUID     | PK          | 主キー（自動生成） |
 | workout_exercise_id | CUID     | FK NOT NULL | トレーニング種目ID |
-| weight              | INTEGER  |             | 重量（kg）         |
+| weight              | INTEGER  |             | 重量（g）          |
 | reps                | INTEGER  |             | 回数               |
 | created_at          | DATETIME | NOT NULL    | 作成日時           |
 | updated_at          | DATETIME | NOT NULL    | 更新日時           |
