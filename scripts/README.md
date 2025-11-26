@@ -27,7 +27,6 @@ cd gym-note-api-ts
 ### 3. 初期セットアップスクリプトを実行
 
 ```bash
-chmod +x scripts/init.sh
 ./scripts/init.sh
 ```
 
