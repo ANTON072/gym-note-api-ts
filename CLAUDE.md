@@ -98,6 +98,20 @@ model User {
 - Prisma enum は使わず、`Int` 型で数値として保存する
 - TypeScript 側で enum を定義して変換・管理する
 
+### Zod スキーマ（v4）
+
+- トップレベルのフォーマット関数を使用する（`z.string().email()` ではなく `z.email()`）
+
+```typescript
+// 推奨
+z.email()
+z.url()
+
+// 非推奨
+z.string().email()
+z.string().url()
+```
+
 ### コメント
 
 - 各ファイルの冒頭には日本語のコメントで仕様を記述する
