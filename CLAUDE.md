@@ -10,7 +10,7 @@
 ## 技術スタック
 
 - **フレームワーク:** Express / TypeScript
-- **データベース:** MySQL
+- **データベース:** MariaDB
 - **ORM:** Prisma
 - **バリデーション:** Zod
 
@@ -62,7 +62,7 @@ gym-note-api-ts/
 ## ローカル開発環境のセットアップ
 
 1. `.env.example`をコピーして`.env`を作成
-2. `docker compose up -d`でMySQLコンテナを起動
+2. `docker compose up -d`でMariaDBコンテナを起動
 3. `npm run prisma:migrate`でマイグレーション実行
 4. `npm run dev`で開発サーバー起動
 

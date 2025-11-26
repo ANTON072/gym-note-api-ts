@@ -1,22 +1,22 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:11
     container_name: gym-note-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gym_note
-      MYSQL_USER: gym_user
-      MYSQL_PASSWORD: gym_password
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: gym_note
+      MARIADB_USER: gym_user
+      MARIADB_PASSWORD: gym_password
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  mysql_data:
+  mariadb_data:

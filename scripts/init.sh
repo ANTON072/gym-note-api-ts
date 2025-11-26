@@ -8,16 +8,20 @@ DOMAIN="api.gym-note.net"
 
 echo "=== サーバー初期セットアップ開始 ==="
 
+# EPELリポジトリを有効化（certbot等に必要）
+echo ">>> EPELリポジトリを有効化中..."
+sudo dnf install -y epel-release
+
 # Node.js 22 のインストール（NodeSourceリポジトリを使用）
 echo ">>> Node.js 22 をインストール中..."
 curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
 sudo dnf install -y nodejs
 node -v
 
-# MySQL のインストール
-echo ">>> MySQL をインストール中..."
-sudo dnf install -y mysql-server
-sudo systemctl enable --now mysqld
+# MariaDB のインストール
+echo ">>> MariaDB をインストール中..."
+sudo dnf install -y mariadb-server
+sudo systemctl enable --now mariadb
 
 # PM2 のインストール
 echo ">>> PM2 をインストール中..."
@@ -60,8 +64,8 @@ sudo dnf install -y certbot python3-certbot-nginx
 echo "=== セットアップ完了 ==="
 echo ""
 echo "次の手順:"
-echo "1. mysql_secure_installation を実行"
-echo "2. MySQLにデータベースとユーザーを作成:"
+echo "1. mariadb-secure-installation を実行"
+echo "2. MariaDBにデータベースとユーザーを作成:"
 echo "   sudo mysql -u root -p"
 echo "   CREATE DATABASE gym_note;"
 echo "   CREATE USER 'gym_user'@'localhost' IDENTIFIED BY 'パスワード';"

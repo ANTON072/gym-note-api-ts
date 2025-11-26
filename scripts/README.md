@@ -32,10 +32,10 @@ cd gym-note-api-ts
 
 ## スクリプト実行後の手動作業
 
-### 1. MySQLのセキュリティ設定
+### 1. MariaDBのセキュリティ設定
 
 ```bash
-sudo mysql_secure_installation
+sudo mariadb-secure-installation
 ```
 
 ### 2. データベースとユーザーの作成
