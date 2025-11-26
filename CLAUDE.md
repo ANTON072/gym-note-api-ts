@@ -113,6 +113,7 @@ model User {
 ## ドキュメント
 
 - [DB テーブル設計](docs/db-table-structure.md)
+- [API エンドポイント一覧](docs/api-endpoints.md)
 
 ## 参考リンク
 
