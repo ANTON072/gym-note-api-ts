@@ -75,6 +75,29 @@ gym-note-api-ts/
 
 - **言語:** TypeScript
 
+### Prisma 命名規則
+
+- **モデル名:** PascalCase 単数形（例: `User`, `Workout`）
+- **フィールド名:** camelCase（例: `firebaseUid`, `createdAt`）
+- **DBテーブル名:** snake_case 複数形（例: `users`, `workouts`）→ `@@map("テーブル名")` で指定
+- **DBカラム名:** snake_case（例: `firebase_uid`, `created_at`）→ `@map("カラム名")` で指定
+
+```prisma
+model User {
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique @map("firebase_uid")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+```
+
+### Enum の扱い
+
+- Prisma enum は使わず、`Int` 型で数値として保存する
+- TypeScript 側で enum を定義して変換・管理する
+
 ### コメント
 
 - 各ファイルの冒頭には日本語のコメントで仕様を記述する

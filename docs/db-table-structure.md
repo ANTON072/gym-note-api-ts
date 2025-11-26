@@ -59,7 +59,7 @@ erDiagram
     workout_exercises ||--o{ workout_sets : "1:N"
 
     users {
-        bigint id PK
+        cuid id PK
         varchar firebase_uid UK
         varchar email
         varchar name
@@ -67,8 +67,8 @@ erDiagram
     }
 
     workouts {
-        bigint id PK
-        bigint user_id FK
+        cuid id PK
+        cuid user_id FK
         datetime performed_start_at
         datetime performed_end_at
         varchar place
@@ -76,23 +76,23 @@ erDiagram
     }
 
     exercises {
-        bigint id PK
-        bigint user_id FK
+        cuid id PK
+        cuid user_id FK
         varchar name
         int body_part
         int laterality
     }
 
     workout_exercises {
-        bigint id PK
-        bigint workout_id FK
-        bigint exercise_id FK
+        cuid id PK
+        cuid workout_id FK
+        cuid exercise_id FK
         int order_index
     }
 
     workout_sets {
-        bigint id PK
-        bigint workout_exercise_id FK
+        cuid id PK
+        cuid workout_exercise_id FK
         int weight
         int reps
     }
@@ -102,19 +102,15 @@ erDiagram
 
 ## users（ユーザー）
 
-| カラム名     | 型           | 制約     | 説明             |
-| ------------ | ------------ | -------- | ---------------- |
-| id           | BIGINT       | PK       | 主キー           |
-| firebase_uid | VARCHAR(255) | UNIQUE   | Firebase UID     |
-| email        | VARCHAR(255) |          | メールアドレス   |
-| name         | VARCHAR(255) |          | ユーザー名       |
-| image_url    | VARCHAR(255) |          | プロフィール画像 |
-| created_at   | DATETIME     | NOT NULL | 作成日時         |
-| updated_at   | DATETIME     | NOT NULL | 更新日時         |
-
-### インデックス
-
-- `index_users_on_firebase_uid` (firebase_uid) UNIQUE
+| カラム名     | 型           | 制約     | 説明                      |
+| ------------ | ------------ | -------- | ------------------------- |
+| id           | CUID         | PK       | 主キー（自動生成）        |
+| firebase_uid | VARCHAR(255) | UNIQUE   | Firebase UID              |
+| email        | VARCHAR(255) |          | メールアドレス            |
+| name         | VARCHAR(255) |          | ユーザー名                |
+| image_url    | VARCHAR(255) |          | プロフィール画像          |
+| created_at   | DATETIME     | NOT NULL | 作成日時                  |
+| updated_at   | DATETIME     | NOT NULL | 更新日時                  |
 
 ---
 
@@ -122,28 +118,14 @@ erDiagram
 
 | カラム名           | 型           | 制約        | 説明                 |
 | ------------------ | ------------ | ----------- | -------------------- |
-| id                 | BIGINT       | PK          | 主キー               |
-| user_id            | BIGINT       | FK NOT NULL | ユーザーID           |
+| id                 | CUID         | PK          | 主キー（自動生成）   |
+| user_id            | CUID         | FK NOT NULL | ユーザーID           |
 | performed_start_at | DATETIME     | NOT NULL    | トレーニング開始時刻 |
 | performed_end_at   | DATETIME     |             | トレーニング終了時刻 |
 | place              | VARCHAR(255) |             | 場所                 |
 | note               | TEXT         |             | メモ                 |
 | created_at         | DATETIME     | NOT NULL    | 作成日時             |
 | updated_at         | DATETIME     | NOT NULL    | 更新日時             |
-
-### インデックス
-
-- `index_workouts_on_user_id` (user_id)
-
-### 外部キー
-
-- `user_id` → `users.id`
-
-### リレーション
-
-- belongs_to: `User`
-- has_many: `WorkoutExercise`
-- has_many: `WorkoutSet` (through: `WorkoutExercise`)
 
 ---
 
@@ -153,28 +135,13 @@ erDiagram
 
 | カラム名   | 型           | 制約        | 説明                         |
 | ---------- | ------------ | ----------- | ---------------------------- |
-| id         | BIGINT       | PK          | 主キー                       |
-| user_id    | BIGINT       | FK NOT NULL | ユーザーID                   |
+| id         | CUID         | PK          | 主キー（自動生成）           |
+| user_id    | CUID         | FK NOT NULL | ユーザーID                   |
 | name       | VARCHAR(255) | NOT NULL    | 種目名                       |
 | body_part  | INTEGER      |             | 部位（enum: 胸、背中など）   |
 | laterality | INTEGER      |             | 左右区分（enum: 両側、片側） |
 | created_at | DATETIME     | NOT NULL    | 作成日時                     |
 | updated_at | DATETIME     | NOT NULL    | 更新日時                     |
-
-### インデックス
-
-- `index_exercises_on_user_id` (user_id)
-- `index_exercises_on_name` (name) UNIQUE
-- `index_exercises_on_body_part` (body_part)
-
-### 外部キー
-
-- `user_id` → `users.id`
-
-### リレーション
-
-- belongs_to: `User`
-- has_many: `WorkoutExercise`
 
 ### Enum 定義
 
@@ -204,30 +171,17 @@ erDiagram
 
 | カラム名    | 型       | 制約        | 説明             |
 | ----------- | -------- | ----------- | ---------------- |
-| id          | BIGINT   | PK          | 主キー           |
-| workout_id  | BIGINT   | FK NOT NULL | トレーニング日ID |
-| exercise_id | BIGINT   | FK NOT NULL | 種目ID           |
+| id          | CUID     | PK          | 主キー（自動生成）|
+| workout_id  | CUID     | FK NOT NULL | トレーニング日ID |
+| exercise_id | CUID     | FK NOT NULL | 種目ID           |
 | order_index | INTEGER  | NOT NULL    | 表示順           |
 | created_at  | DATETIME | NOT NULL    | 作成日時         |
 | updated_at  | DATETIME | NOT NULL    | 更新日時         |
 
-### インデックス
+### 複合ユニーク制約
 
-- `index_workout_exercises_on_workout_id` (workout_id)
-- `index_workout_exercises_on_exercise_id` (exercise_id)
-- `index_workout_exercises_on_workout_id_and_exercise_id` (workout_id, exercise_id) UNIQUE
-- `index_workout_exercises_on_workout_id_and_order_index` (workout_id, order_index) UNIQUE
-
-### 外部キー
-
-- `workout_id` → `workouts.id`
-- `exercise_id` → `exercises.id`
-
-### リレーション
-
-- belongs_to: `Workout`
-- belongs_to: `Exercise`
-- has_many: `WorkoutSet`
+- (workout_id, exercise_id) - 同じワークアウトに同じ種目は1回のみ
+- (workout_id, order_index) - 同じワークアウト内で表示順は重複不可
 
 ---
 
@@ -237,24 +191,10 @@ erDiagram
 
 | カラム名            | 型       | 制約        | 説明               |
 | ------------------- | -------- | ----------- | ------------------ |
-| id                  | BIGINT   | PK          | 主キー             |
-| workout_exercise_id | BIGINT   | FK NOT NULL | トレーニング種目ID |
+| id                  | CUID     | PK          | 主キー（自動生成） |
+| workout_exercise_id | CUID     | FK NOT NULL | トレーニング種目ID |
 | weight              | INTEGER  |             | 重量（kg）         |
 | reps                | INTEGER  |             | 回数               |
 | created_at          | DATETIME | NOT NULL    | 作成日時           |
 | updated_at          | DATETIME | NOT NULL    | 更新日時           |
 
-### インデックス
-
-- `index_workout_sets_on_workout_exercise_id` (workout_exercise_id)
-- `index_workout_sets_on_workout_exercise_id_and_order_index` (workout_exercise_id, order_index) UNIQUE
-- `index_workout_sets_on_type` (type)
-- `index_workout_sets_on_volume` (volume)
-
-### 外部キー
-
-- `workout_exercise_id` → `workout_exercises.id` (ON DELETE CASCADE)
-
-### リレーション
-
-- belongs_to: `WorkoutExercise`

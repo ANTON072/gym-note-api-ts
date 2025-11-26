@@ -10,6 +10,9 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
   "eslint.validate": ["typescript"],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

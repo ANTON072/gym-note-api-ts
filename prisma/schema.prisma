@@ -1,5 +1,6 @@
 // Prismaスキーマファイル
 // データベースモデルの定義
+// See: docs/db-table-structure.md
 
 generator client {
   provider = "prisma-client-js"
@@ -10,49 +11,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ユーザーモデル（Firebase UIDと紐付け）
 model User {
-  id        String   @id @default(cuid())
-  firebaseUid String @unique @map("firebase_uid")
-  email     String?
-  name      String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique @map("firebase_uid")
+  email       String?
+  name        String?
+  imageUrl    String?  @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  workoutLogs WorkoutLog[]
+  workouts  Workout[]
+  exercises Exercise[]
 
   @@map("users")
 }
 
-// 筋トレログモデル
-model WorkoutLog {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  date      DateTime
-  note      String?  @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model Workout {
+  id               String    @id @default(cuid())
+  userId           String    @map("user_id")
+  performedStartAt DateTime  @map("performed_start_at")
+  performedEndAt   DateTime? @map("performed_end_at")
+  place            String?
+  note             String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exercises Exercise[]
+  user             User              @relation(fields: [userId], references: [id])
+  workoutExercises WorkoutExercise[]
 
-  @@map("workout_logs")
+  @@map("workouts")
 }
 
-// エクササイズモデル
 model Exercise {
-  id           String   @id @default(cuid())
-  workoutLogId String   @map("workout_log_id")
-  name         String
-  sets         Int
-  reps         Int
-  weight       Float?
-  note         String?  @db.Text
-  order        Int      @default(0)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  name       String
+  bodyPart   Int?     @map("body_part")
+  laterality Int?     @map("laterality")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  workoutLog   WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id])
+  workoutExercises WorkoutExercise[]
 
   @@map("exercises")
+}
+
+model WorkoutExercise {
+  id         String   @id @default(cuid())
+  workoutId  String   @map("workout_id")
+  exerciseId String   @map("exercise_id")
+  orderIndex Int      @map("order_index")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  workout     Workout      @relation(fields: [workoutId], references: [id])
+  exercise    Exercise     @relation(fields: [exerciseId], references: [id])
+  workoutSets WorkoutSet[]
+
+  // 同じworkoutに同じexerciseは1回のみ追加が可能
+  @@unique([workoutId, exerciseId])
+  // 同じworkout内で表示順は重複不可
+  @@unique([workoutId, orderIndex])
+  @@map("workout_exercises")
+}
+
+model WorkoutSet {
+  id                String   @id @default(cuid())
+  workoutExerciseId String   @map("workout_exercise_id")
+  weight            Int?
+  reps              Int?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id])
+
+  @@map("workout_sets")
 }
