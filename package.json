@@ -12,7 +12,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "firebase:start": "firebase emulators:start --only auth --project gym-note-app --import=./emulator-data --export-on-exit"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -35,6 +36,7 @@
     "@types/supertest": "^6.0.3",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
+    "firebase-tools": "^14.26.0",
     "prettier": "^3.6.2",
     "supertest": "^7.1.4",
     "tsx": "^4.20.6",
