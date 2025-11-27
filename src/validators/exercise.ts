@@ -2,7 +2,7 @@ import z from "zod";
 
 export const exerciseSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().min(1).max(100),
   bodyPart: z.number().int().min(0).max(5).nullable(),
   laterality: z.number().int().min(0).max(1).nullable(),
   createdAt: z.date(),

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { prisma } from "../config/database";
 
+import { prisma } from "@/config/database";
 import type { Exercise } from "@/validators/exercise";
 import { AppError } from "@/middlewares/errorHandler";
 
@@ -9,7 +9,7 @@ import { AppError } from "@/middlewares/errorHandler";
  */
 export async function fetchExercises(userId: string): Promise<Exercise[]> {
   return await prisma.exercise.findMany({
-    where: { userId },
+    where: { userId, deletedAt: null },
   });
 }
 
