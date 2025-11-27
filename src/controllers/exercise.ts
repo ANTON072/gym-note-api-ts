@@ -7,7 +7,6 @@ import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/middlewares/auth";
 import { AppError } from "@/middlewares/errorHandler";
 import { fetchExercises, createExercise } from "@/services/exercise";
-import { findOrCreateUser } from "@/services/user";
 import { exerciseRequestSchema } from "@/validators/exercise";
 
 /**
@@ -20,9 +19,7 @@ export async function getExercisesController(
   next: NextFunction
 ): Promise<void> {
   try {
-    const firebaseUid = req.user!.uid;
-    const user = await findOrCreateUser(firebaseUid);
-
+    const user = req.user!;
     const exercises = await fetchExercises(user.id);
     res.status(200).json({ exercises });
   } catch (error) {
@@ -51,9 +48,7 @@ export async function createExerciseController(
       });
     }
 
-    const firebaseUid = req.user!.uid;
-    const user = await findOrCreateUser(firebaseUid);
-
+    const user = req.user!;
     const exercise = await createExercise({
       userId: user.id,
       exerciseData: result.data,

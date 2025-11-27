@@ -5,6 +5,8 @@
 import { Request, Response, NextFunction } from "express";
 import { admin, initializeFirebase } from "@/config/firebase";
 import { AppError } from "./errorHandler";
+import { findOrCreateUser } from "@/services/user";
+import { User } from "@/validators/user";
 
 // Firebase初期化
 initializeFirebase();
@@ -13,7 +15,8 @@ initializeFirebase();
  * 認証済みリクエストの型定義
  */
 export interface AuthenticatedRequest extends Request {
-  user?: admin.auth.DecodedIdToken;
+  decodedToken?: admin.auth.DecodedIdToken;
+  user?: User;
 }
 
 /**
@@ -37,7 +40,11 @@ export async function authMiddleware(
 
     const token = authHeader.split("Bearer ")[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
+    req.decodedToken = decodedToken;
+
+    // ユーザーを取得してリクエストに追加する
+    const user = await findOrCreateUser(decodedToken.uid);
+    req.user = user;
     next();
   } catch (error) {
     if (error instanceof AppError) {

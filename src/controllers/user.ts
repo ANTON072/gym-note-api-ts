@@ -5,7 +5,6 @@
 import { Response, NextFunction } from "express";
 
 import { AuthenticatedRequest } from "@/middlewares/auth";
-import { findOrCreateUser } from "@/services/user";
 
 /**
  * 現在のユーザー情報を取得
@@ -17,9 +16,7 @@ export async function getCurrentUserController(
   next: NextFunction
 ): Promise<void> {
   try {
-    const firebaseUid = req.user!.uid;
-    const user = await findOrCreateUser(firebaseUid);
-
+    const user = req.user!;
     res.status(200).json({ user });
   } catch (error) {
     next(error);
