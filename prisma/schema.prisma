@@ -56,6 +56,7 @@ model Exercise {
   user             User              @relation(fields: [userId], references: [id])
   workoutExercises WorkoutExercise[]
 
+  @@unique([userId, name]) // ユーザーごとに名前がユニーク
   @@map("exercises")
 }
 
