@@ -36,7 +36,8 @@ gym-note-api-ts/
 │   ├── routes/              # ルート定義
 │   ├── services/            # ビジネスロジック
 │   ├── types/               # 型定義
-│   ├── utils/               # ユーティリティ関数
+│   ├── utils/
+│   │   └── validation.ts    # バリデーションユーティリティ
 │   ├── validators/          # Zodスキーマ
 │   ├── app.ts               # Expressアプリ設定
 │   └── index.ts             # エントリーポイント
@@ -116,6 +117,29 @@ z.string().url();
 
 - 各ファイルの冒頭には日本語のコメントで仕様を記述する
 
+### Controller / Service の命名規則
+
+- **Controller 関数:** サフィックスに `Controller` をつける（例: `getExercisesController`, `createExerciseController`）
+- **Service 関数:** シンプルな名前を使用（例: `fetchExercises`, `createExercise`）
+- これにより検索時に Controller と Service を区別しやすくなる
+
+### レイヤーの責務
+
+| レイヤー | 責務 |
+| --- | --- |
+| Controller | HTTP リクエスト/レスポンス処理、バリデーション（形式チェック） |
+| Service | ビジネスロジック、DB 操作、外部サービス連携 |
+
+- **バリデーション:** Controller で `validateRequest()` ユーティリティを使用
+- **ビジネスルールの検証:** Service で実施（重複チェック、権限、整合性など）
+- **Prisma エラー（P2002 など）のハンドリング:** Service で AppError に変換
+
+### 認証ミドルウェア
+
+- `req.decodedToken`: Firebase の DecodedIdToken（JWT の中身）
+- `req.user`: DB の User オブジェクト（認証ミドルウェアで取得済み）
+- Controller では `req.user!` から直接ユーザー情報を取得する
+
 ### API レスポンス規約
 
 #### エラーレスポンス
@@ -140,6 +164,7 @@ z.string().url();
 | 401             | UNAUTHORIZED     | 認証エラー             |
 | 403             | FORBIDDEN        | アクセス権限なし       |
 | 404             | NOT_FOUND        | リソースが見つからない |
+| 409             | CONFLICT         | リソースの競合（重複など） |
 | 500             | INTERNAL_ERROR   | サーバー内部エラー     |
 
 **例: 基本的なエラーレスポンス**
