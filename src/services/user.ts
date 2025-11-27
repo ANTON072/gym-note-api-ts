@@ -2,8 +2,9 @@
  * User Service
  * Userの取得、作成に関するビジネスロジック
  */
-import { prisma } from "../config/database";
-import { admin } from "../config/firebase";
+import { prisma } from "@/config/database";
+import { admin } from "@/config/firebase";
+
 import type { User } from "@prisma/client";
 
 /**

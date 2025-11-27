@@ -2,9 +2,11 @@
  * ユーザーサービスのテスト
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import { prisma } from "@/config/database";
+import { admin } from "@/config/firebase";
+
 import { findOrCreateUser } from "./user";
-import { prisma } from "../config/database";
-import { admin } from "../config/firebase";
 
 // Prismaのモック
 vi.mock("../config/database", () => ({

@@ -3,14 +3,15 @@
  * ユーザーに関するAPIエンドポイント
  */
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "../middlewares/auth";
-import { findOrCreateUser } from "../services/user";
+
+import { AuthenticatedRequest } from "@/middlewares/auth";
+import { findOrCreateUser } from "@/services/user";
 
 /**
  * 現在のユーザー情報を取得
  * GET /api/v1/user
  */
-export async function getCurrentUser(
+export async function getCurrentUserController(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction

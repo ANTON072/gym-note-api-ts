@@ -4,12 +4,13 @@
  */
 
 import { Router } from "express";
-import { getCurrentUser } from "../controllers/user";
-import { authMiddleware } from "../middlewares/auth";
+
+import { authMiddleware } from "@/middlewares/auth";
+import { getCurrentUserController } from "@/controllers/user";
 
 const router = Router();
 
 // GET /api/v1/user
-router.get("/", authMiddleware, getCurrentUser);
+router.get("/", authMiddleware, getCurrentUserController);
 
 export default router;

@@ -3,7 +3,7 @@
  * JWTトークンを検証し、ユーザー情報をリクエストに追加する
  */
 import { Request, Response, NextFunction } from "express";
-import { admin, initializeFirebase } from "../config/firebase";
+import { admin, initializeFirebase } from "@/config/firebase";
 import { AppError } from "./errorHandler";
 
 // Firebase初期化

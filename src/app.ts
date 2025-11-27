@@ -8,6 +8,7 @@ import helmet from "helmet";
 import { errorHandler } from "./middlewares/errorHandler";
 import healthRouter from "./routes/health";
 import userRouter from "./routes/user";
+import exerciseRouter from "./routes/exercise";
 
 const app: Application = express();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // ルートの設定
 app.use("/health", healthRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/exercises", exerciseRouter);
 
 // エラーハンドリング
 app.use(errorHandler);
