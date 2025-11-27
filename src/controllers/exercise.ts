@@ -5,8 +5,10 @@
 import { Response, NextFunction } from "express";
 
 import { AuthenticatedRequest } from "@/middlewares/auth";
+import { AppError } from "@/middlewares/errorHandler";
 import { fetchExercises, createExercise } from "@/services/exercise";
 import { findOrCreateUser } from "@/services/user";
+import { exerciseRequestSchema } from "@/validators/exercise";
 
 /**
  * Exercise一覧を取得
@@ -38,13 +40,23 @@ export async function createExerciseController(
   next: NextFunction
 ): Promise<void> {
   try {
+    // バリデーション
+    const result = exerciseRequestSchema.safeParse(req.body);
+    if (!result.success) {
+      throw new AppError(400, "VALIDATION_ERROR", "入力内容に誤りがあります", {
+        fields: result.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
+    }
+
     const firebaseUid = req.user!.uid;
     const user = await findOrCreateUser(firebaseUid);
 
-    const exerciseData = req.body;
     const exercise = await createExercise({
       userId: user.id,
-      exerciseData,
+      exerciseData: result.data,
     });
 
     res.status(201).json({ exercise });

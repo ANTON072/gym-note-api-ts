@@ -27,3 +27,14 @@ GET {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
 
 ###
+
+# POST Create Exercise
+POST {{apiHost}}/api/v1/exercises
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "name": "Push Up",
+  "bodyPart": 0,
+  "laterality": 0
+}
