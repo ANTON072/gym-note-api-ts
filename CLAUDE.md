@@ -25,6 +25,8 @@ gym-note-api-ts/
 ├── prisma/
 │   └── schema.prisma        # DBスキーマ定義
 ├── src/
+│   ├── __tests__/
+│   │   └── fixtures/        # テスト用モックデータ
 │   ├── config/
 │   │   ├── database.ts      # Prismaクライアント
 │   │   ├── env.ts           # 環境変数（Zodバリデーション）
@@ -35,6 +37,14 @@ gym-note-api-ts/
 │   │   └── errorHandler.ts  # グローバルエラーハンドラー
 │   ├── routes/              # ルート定義
 │   ├── services/            # ビジネスロジック
+│   │   ├── exercise.ts      # 単一ファイル形式
+│   │   └── workout/         # ディレクトリ形式（大きなサービス）
+│   │       ├── index.ts     # re-export
+│   │       ├── types.ts     # 共通の型・定数
+│   │       ├── create.ts    # 作成処理
+│   │       ├── fetch.ts     # 取得処理
+│   │       ├── update.ts    # 更新処理
+│   │       └── delete.ts    # 削除処理
 │   ├── types/               # 型定義
 │   ├── utils/
 │   │   └── validation.ts    # バリデーションユーティリティ
@@ -46,6 +56,12 @@ gym-note-api-ts/
 ├── tsconfig.json            # TypeScript設定
 └── vitest.config.ts         # Vitest設定
 ```
+
+### サービスのファイル構成
+
+- **小規模なサービス:** 単一ファイル（例: `services/exercise.ts`）
+- **大規模なサービス:** ディレクトリに分割（例: `services/workout/`）
+  - `index.ts` で関数をre-exportし、インポート側は `@/services/workout` で統一
 
 ## 利用可能なコマンド
 
