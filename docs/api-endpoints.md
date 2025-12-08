@@ -118,15 +118,11 @@
 
 ### DELETE `/api/v1/exercises/:exerciseId`
 
-種目を削除します。
+種目を削除します（論理削除）。
 
 #### レスポンス
 
-```json
-{
-  "message": "削除しました"
-}
-```
+`204 No Content`（ボディなし）
 
 ---
 
@@ -237,6 +233,8 @@
 
 #### リクエスト
 
+**既存エクササイズを使用する場合:**
+
 ```json
 {
   "performedStartAt": "2024-01-15T10:00:00.000Z",
@@ -245,7 +243,7 @@
   "note": "調子良かった",
   "workoutExercises": [
     {
-      "exerciseId": "cuid",
+      "exercise": { "id": "cuid" },
       "orderIndex": 1,
       "workoutSets": [
         { "weight": 60, "reps": 10 },
@@ -256,18 +254,42 @@
 }
 ```
 
-| フィールド                              | 型               | 必須 | 説明             |
-| --------------------------------------- | ---------------- | ---- | ---------------- |
-| performedStartAt                        | string (ISO8601) | ○    | 開始日時         |
-| performedEndAt                          | string (ISO8601) | -    | 終了日時         |
-| place                                   | string           | -    | 場所             |
-| note                                    | string           | -    | メモ             |
-| workoutExercises                        | array            | -    | 実施した種目一覧 |
-| workoutExercises[].exerciseId           | string           | ○    | 種目ID           |
-| workoutExercises[].orderIndex           | number           | ○    | 表示順           |
-| workoutExercises[].workoutSets          | array            | -    | セット一覧       |
-| workoutExercises[].workoutSets[].weight | number           | -    | 重量（kg）       |
-| workoutExercises[].workoutSets[].reps   | number           | -    | 回数             |
+**新規エクササイズを作成する場合:**
+
+```json
+{
+  "performedStartAt": "2024-01-15T10:00:00.000Z",
+  "performedEndAt": null,
+  "place": "自宅",
+  "note": null,
+  "workoutExercises": [
+    {
+      "exercise": { "name": "懸垂", "bodyPart": 1, "laterality": 0 },
+      "orderIndex": 1,
+      "workoutSets": [
+        { "weight": null, "reps": 10 }
+      ]
+    }
+  ]
+}
+```
+
+| フィールド                              | 型               | 必須 | 説明                                      |
+| --------------------------------------- | ---------------- | ---- | ----------------------------------------- |
+| performedStartAt                        | string (ISO8601) | ○    | 開始日時                                  |
+| performedEndAt                          | string (ISO8601) | -    | 終了日時                                  |
+| place                                   | string           | -    | 場所                                      |
+| note                                    | string           | -    | メモ                                      |
+| workoutExercises                        | array            | -    | 実施した種目一覧                          |
+| workoutExercises[].exercise             | object           | ○    | 種目指定（下記のいずれか）                |
+| workoutExercises[].exercise.id          | string           | -    | 既存種目のID                              |
+| workoutExercises[].exercise.name        | string           | -    | 新規種目の名前                            |
+| workoutExercises[].exercise.bodyPart    | number           | -    | 新規種目の部位                            |
+| workoutExercises[].exercise.laterality  | number           | -    | 新規種目の左右区分                        |
+| workoutExercises[].orderIndex           | number           | ○    | 表示順                                    |
+| workoutExercises[].workoutSets          | array            | -    | セット一覧                                |
+| workoutExercises[].workoutSets[].weight | number           | -    | 重量（kg）                                |
+| workoutExercises[].workoutSets[].reps   | number           | -    | 回数                                      |
 
 #### レスポンス
 
@@ -287,15 +309,11 @@ POST と同じ形式
 
 ### DELETE `/api/v1/workouts/:workoutId`
 
-トレーニングを削除します。関連する WorkoutExercises と WorkoutSets も削除されます。
+トレーニングを削除します（論理削除）。
 
 #### レスポンス
 
-```json
-{
-  "message": "削除しました"
-}
-```
+`204 No Content`（ボディなし）
 
 ---
 
