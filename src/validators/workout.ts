@@ -1,5 +1,5 @@
 import z from "zod";
-import { exerciseSchema } from "./exercise";
+import { exerciseSchema, exerciseRequestSchema } from "./exercise";
 
 export const workoutSetSchema = z.object({
   id: z.string(),
@@ -16,16 +16,19 @@ export const workoutExerciseSchema = z.object({
   workoutSets: z.array(workoutSetSchema),
 });
 
-export const workoutExerciseRequestSchema = workoutExerciseSchema
-  .omit({
-    id: true,
-    exercise: true,
-    workoutSets: true,
-  })
-  .extend({
-    exerciseId: z.string(),
-    workoutSets: z.array(workoutSetRequestSchema),
-  });
+/**
+ * エクササイズ指定スキーマ
+ * - id のみ: 既存エクササイズを使用
+ * - name, bodyPart, laterality: 新規エクササイズを作成
+ */
+const existingExerciseSchema = z.object({ id: z.string() });
+const newExerciseSchema = exerciseRequestSchema;
+
+export const workoutExerciseRequestSchema = z.object({
+  exercise: z.union([existingExerciseSchema, newExerciseSchema]),
+  orderIndex: z.number().int().min(0),
+  workoutSets: z.array(workoutSetRequestSchema),
+});
 
 export const workoutSchema = z.object({
   id: z.string(),
