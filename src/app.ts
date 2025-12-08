@@ -9,6 +9,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import healthRouter from "./routes/health";
 import userRouter from "./routes/user";
 import exerciseRouter from "./routes/exercise";
+import workoutRouter from "./routes/workout";
 
 const app: Application = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/health", healthRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/exercises", exerciseRouter);
+app.use("/api/v1/workouts", workoutRouter);
 
 // エラーハンドリング
 app.use(errorHandler);
