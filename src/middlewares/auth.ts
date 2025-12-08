@@ -31,18 +31,26 @@ export async function authMiddleware(
   _res: Response,
   next: NextFunction
 ): Promise<void> {
+  // 1. Authorizationヘッダーの検証
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    next(new AppError(401, "UNAUTHORIZED", "認証トークンが必要です"));
+    return;
+  }
+
+  // 2. Firebaseトークンの検証
+  const token = authHeader.split("Bearer ")[1];
+  let decodedToken: admin.auth.DecodedIdToken;
   try {
-    const authHeader = req.headers.authorization;
+    decodedToken = await admin.auth().verifyIdToken(token);
+  } catch {
+    next(new AppError(401, "UNAUTHORIZED", "無効な認証トークンです"));
+    return;
+  }
+  req.decodedToken = decodedToken;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new AppError(401, "UNAUTHORIZED", "認証トークンが必要です");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.decodedToken = decodedToken;
-
-    // ユーザーを取得してリクエストに追加する
+  // 3. ユーザー情報の取得
+  try {
     const user = await findOrCreateUser(decodedToken.uid);
     req.user = user;
     next();
@@ -51,6 +59,9 @@ export async function authMiddleware(
       next(error);
       return;
     }
-    next(new AppError(401, "UNAUTHORIZED", "無効な認証トークンです"));
+    // DB接続エラーなどは内部エラーとして処理
+    next(
+      new AppError(500, "INTERNAL_ERROR", "サーバー内部エラーが発生しました")
+    );
   }
 }
