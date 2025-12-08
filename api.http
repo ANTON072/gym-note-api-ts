@@ -80,6 +80,18 @@ content-type: application/json
 
 ###
 
+# GET Workouts
+GET {{apiHost}}/api/v1/workouts
+Authorization: Bearer {{idToken}}
+
+###
+
+# GET Workouts with offset
+GET {{apiHost}}/api/v1/workouts?offset=20
+Authorization: Bearer {{idToken}}
+
+###
+
 # POST Create Workout (既存エクササイズを使用)
 POST {{apiHost}}/api/v1/workouts
 Authorization: Bearer {{idToken}}

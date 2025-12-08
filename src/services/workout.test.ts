@@ -4,14 +4,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { prisma } from "@/config/database";
+import {
+  TEST_USER_ID,
+  mockExercise,
+  mockWorkoutWithRelations,
+  mockWorkoutList,
+  expectedWorkoutInclude,
+} from "@/__tests__/fixtures/workout";
 
-import { createWorkout } from "./workout";
+import { createWorkout, fetchWorkouts } from "./workout";
 
 // Prismaのモック
 vi.mock("@/config/database", () => ({
   prisma: {
     workout: {
       create: vi.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
     },
     exercise: {
       findMany: vi.fn(),
@@ -26,51 +35,14 @@ describe("ワークアウトサービス", () => {
   });
 
   describe("createWorkout", () => {
-    const mockExercise = {
-      id: "exercise1",
-      userId: "user123",
-      name: "ベンチプレス",
-      bodyPart: 1,
-      laterality: null,
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const mockCreatedWorkout = {
-      id: "workout1",
-      userId: "user123",
-      performedStartAt: new Date("2024-01-15T10:00:00Z"),
-      performedEndAt: new Date("2024-01-15T11:30:00Z"),
-      place: "ジム",
-      note: "調子良かった",
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      workoutExercises: [
-        {
-          id: "we1",
-          orderIndex: 1,
-          exercise: {
-            id: "exercise1",
-            name: "ベンチプレス",
-            bodyPart: 1,
-            laterality: null,
-          },
-          workoutSets: [
-            { id: "ws1", weight: 60, reps: 10 },
-            { id: "ws2", weight: 70, reps: 8 },
-          ],
-        },
-      ],
-    };
-
     it("既存エクササイズを使ってワークアウトを作成できる", async () => {
       vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
-      vi.mocked(prisma.workout.create).mockResolvedValue(mockCreatedWorkout);
+      vi.mocked(prisma.workout.create).mockResolvedValue(
+        mockWorkoutWithRelations
+      );
 
       const result = await createWorkout({
-        userId: "user123",
+        userId: TEST_USER_ID,
         workoutData: {
           performedStartAt: new Date("2024-01-15T10:00:00Z"),
           performedEndAt: new Date("2024-01-15T11:30:00Z"),
@@ -92,14 +64,14 @@ describe("ワークアウトサービス", () => {
       expect(prisma.exercise.findMany).toHaveBeenCalledWith({
         where: {
           id: { in: ["exercise1"] },
-          userId: "user123",
+          userId: TEST_USER_ID,
           deletedAt: null,
         },
       });
 
       expect(prisma.workout.create).toHaveBeenCalledWith({
         data: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           performedStartAt: new Date("2024-01-15T10:00:00Z"),
           performedEndAt: new Date("2024-01-15T11:30:00Z"),
           place: "ジム",
@@ -119,35 +91,23 @@ describe("ワークアウトサービス", () => {
             ],
           },
         },
-        include: {
-          workoutExercises: {
-            include: {
-              exercise: true,
-              workoutSets: true,
-            },
-            orderBy: { orderIndex: "asc" },
-          },
-        },
+        include: expectedWorkoutInclude,
       });
 
-      expect(result).toEqual(mockCreatedWorkout);
+      expect(result).toEqual(mockWorkoutWithRelations);
     });
 
     it("新規エクササイズを作成してワークアウトを作成できる", async () => {
       const newExercise = {
+        ...mockExercise,
         id: "new-exercise1",
-        userId: "user123",
         name: "新種目",
         bodyPart: 2,
-        laterality: null,
-        deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
       vi.mocked(prisma.exercise.create).mockResolvedValue(newExercise);
 
       const mockWorkoutWithNewExercise = {
-        ...mockCreatedWorkout,
+        ...mockWorkoutWithRelations,
         workoutExercises: [
           {
             id: "we1",
@@ -167,7 +127,7 @@ describe("ワークアウトサービス", () => {
       );
 
       const result = await createWorkout({
-        userId: "user123",
+        userId: TEST_USER_ID,
         workoutData: {
           performedStartAt: new Date("2024-01-15T10:00:00Z"),
           performedEndAt: null,
@@ -185,40 +145,10 @@ describe("ワークアウトサービス", () => {
 
       expect(prisma.exercise.create).toHaveBeenCalledWith({
         data: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           name: "新種目",
           bodyPart: 2,
           laterality: null,
-        },
-      });
-
-      expect(prisma.workout.create).toHaveBeenCalledWith({
-        data: {
-          userId: "user123",
-          performedStartAt: new Date("2024-01-15T10:00:00Z"),
-          performedEndAt: null,
-          place: null,
-          note: null,
-          workoutExercises: {
-            create: [
-              {
-                exerciseId: "new-exercise1",
-                orderIndex: 1,
-                workoutSets: {
-                  create: [],
-                },
-              },
-            ],
-          },
-        },
-        include: {
-          workoutExercises: {
-            include: {
-              exercise: true,
-              workoutSets: true,
-            },
-            orderBy: { orderIndex: "asc" },
-          },
         },
       });
 
@@ -227,7 +157,7 @@ describe("ワークアウトサービス", () => {
 
     it("workoutExercisesが空でもワークアウトを作成できる", async () => {
       const mockWorkoutWithoutExercises = {
-        ...mockCreatedWorkout,
+        ...mockWorkoutWithRelations,
         workoutExercises: [],
       };
       vi.mocked(prisma.workout.create).mockResolvedValue(
@@ -235,7 +165,7 @@ describe("ワークアウトサービス", () => {
       );
 
       const result = await createWorkout({
-        userId: "user123",
+        userId: TEST_USER_ID,
         workoutData: {
           performedStartAt: new Date("2024-01-15T10:00:00Z"),
           performedEndAt: null,
@@ -255,7 +185,7 @@ describe("ワークアウトサービス", () => {
 
       await expect(
         createWorkout({
-          userId: "user123",
+          userId: TEST_USER_ID,
           workoutData: {
             performedStartAt: new Date("2024-01-15T10:00:00Z"),
             performedEndAt: null,
@@ -281,7 +211,7 @@ describe("ワークアウトサービス", () => {
 
       await expect(
         createWorkout({
-          userId: "user123",
+          userId: TEST_USER_ID,
           workoutData: {
             performedStartAt: new Date("2024-01-15T10:00:00Z"),
             performedEndAt: null,
@@ -299,6 +229,75 @@ describe("ワークアウトサービス", () => {
       ).rejects.toMatchObject({
         statusCode: 400,
         code: "VALIDATION_ERROR",
+      });
+    });
+  });
+
+  describe("fetchWorkouts", () => {
+    it("ワークアウト一覧とページング情報を返す", async () => {
+      vi.mocked(prisma.workout.findMany).mockResolvedValue(mockWorkoutList);
+      vi.mocked(prisma.workout.count).mockResolvedValue(2);
+
+      const result = await fetchWorkouts({ userId: TEST_USER_ID });
+
+      expect(prisma.workout.findMany).toHaveBeenCalledWith({
+        where: { userId: TEST_USER_ID, deletedAt: null },
+        include: expectedWorkoutInclude,
+        orderBy: { performedStartAt: "desc" },
+        skip: 0,
+        take: 20,
+      });
+
+      expect(prisma.workout.count).toHaveBeenCalledWith({
+        where: { userId: TEST_USER_ID, deletedAt: null },
+      });
+
+      expect(result).toEqual({
+        workouts: mockWorkoutList,
+        paging: {
+          total: 2,
+          offset: 0,
+          limit: 20,
+        },
+      });
+    });
+
+    it("offsetを指定した場合、スキップして取得する", async () => {
+      vi.mocked(prisma.workout.findMany).mockResolvedValue([
+        mockWorkoutList[1],
+      ]);
+      vi.mocked(prisma.workout.count).mockResolvedValue(2);
+
+      const result = await fetchWorkouts({ userId: TEST_USER_ID, offset: 1 });
+
+      expect(prisma.workout.findMany).toHaveBeenCalledWith({
+        where: { userId: TEST_USER_ID, deletedAt: null },
+        include: expectedWorkoutInclude,
+        orderBy: { performedStartAt: "desc" },
+        skip: 1,
+        take: 20,
+      });
+
+      expect(result.paging).toEqual({
+        total: 2,
+        offset: 1,
+        limit: 20,
+      });
+    });
+
+    it("ワークアウトが存在しない場合、空配列を返す", async () => {
+      vi.mocked(prisma.workout.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.workout.count).mockResolvedValue(0);
+
+      const result = await fetchWorkouts({ userId: TEST_USER_ID });
+
+      expect(result).toEqual({
+        workouts: [],
+        paging: {
+          total: 0,
+          offset: 0,
+          limit: 20,
+        },
       });
     });
   });

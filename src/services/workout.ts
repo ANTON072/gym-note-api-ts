@@ -131,3 +131,50 @@ export async function createWorkout({
 
   return workout;
 }
+
+/** ページングのデフォルト件数 */
+const DEFAULT_LIMIT = 20;
+
+/** fetchWorkouts の戻り値の型 */
+type FetchWorkoutsResult = {
+  workouts: WorkoutWithRelations[];
+  paging: {
+    total: number;
+    offset: number;
+    limit: number;
+  };
+};
+
+/**
+ * ワークアウト一覧を取得する
+ * ページング対応
+ */
+export async function fetchWorkouts({
+  userId,
+  offset = 0,
+}: {
+  userId: string;
+  offset?: number;
+}): Promise<FetchWorkoutsResult> {
+  const where = { userId, deletedAt: null };
+
+  const [workouts, total] = await Promise.all([
+    prisma.workout.findMany({
+      where,
+      include: workoutWithRelations,
+      orderBy: { performedStartAt: "desc" },
+      skip: offset,
+      take: DEFAULT_LIMIT,
+    }),
+    prisma.workout.count({ where }),
+  ]);
+
+  return {
+    workouts,
+    paging: {
+      total,
+      offset,
+      limit: DEFAULT_LIMIT,
+    },
+  };
+}
