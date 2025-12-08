@@ -12,7 +12,7 @@ import {
   expectedWorkoutInclude,
 } from "@/__tests__/fixtures/workout";
 
-import { createWorkout, fetchWorkouts } from "./workout";
+import { createWorkout, fetchWorkouts, fetchWorkoutById } from "./workout";
 
 // Prismaのモック
 vi.mock("@/config/database", () => ({
@@ -20,6 +20,7 @@ vi.mock("@/config/database", () => ({
     workout: {
       create: vi.fn(),
       findMany: vi.fn(),
+      findUnique: vi.fn(),
       count: vi.fn(),
     },
     exercise: {
@@ -298,6 +299,73 @@ describe("ワークアウトサービス", () => {
           offset: 0,
           limit: 20,
         },
+      });
+    });
+  });
+
+  describe("fetchWorkoutById", () => {
+    it("指定したIDのワークアウトを返す", async () => {
+      vi.mocked(prisma.workout.findUnique).mockResolvedValue(
+        mockWorkoutWithRelations
+      );
+
+      const result = await fetchWorkoutById({
+        workoutId: "workout1",
+        userId: TEST_USER_ID,
+      });
+
+      expect(prisma.workout.findUnique).toHaveBeenCalledWith({
+        where: { id: "workout1" },
+        include: expectedWorkoutInclude,
+      });
+      expect(result).toEqual(mockWorkoutWithRelations);
+    });
+
+    it("存在しないワークアウトの場合、NOT_FOUNDエラーをスローする", async () => {
+      vi.mocked(prisma.workout.findUnique).mockResolvedValue(null);
+
+      await expect(
+        fetchWorkoutById({
+          workoutId: "nonexistent",
+          userId: TEST_USER_ID,
+        })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: "NOT_FOUND",
+      });
+    });
+
+    it("他のユーザーのワークアウトは取得できない", async () => {
+      vi.mocked(prisma.workout.findUnique).mockResolvedValue({
+        ...mockWorkoutWithRelations,
+        userId: "other-user",
+      });
+
+      await expect(
+        fetchWorkoutById({
+          workoutId: "workout1",
+          userId: TEST_USER_ID,
+        })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: "NOT_FOUND",
+      });
+    });
+
+    it("削除済みのワークアウトは取得できない", async () => {
+      vi.mocked(prisma.workout.findUnique).mockResolvedValue({
+        ...mockWorkoutWithRelations,
+        deletedAt: new Date(),
+      });
+
+      await expect(
+        fetchWorkoutById({
+          workoutId: "workout1",
+          userId: TEST_USER_ID,
+        })
+      ).rejects.toMatchObject({
+        statusCode: 404,
+        code: "NOT_FOUND",
       });
     });
   });

@@ -178,3 +178,25 @@ export async function fetchWorkouts({
     },
   };
 }
+
+/**
+ * 指定IDのワークアウトを取得する
+ */
+export async function fetchWorkoutById({
+  workoutId,
+  userId,
+}: {
+  workoutId: string;
+  userId: string;
+}): Promise<WorkoutWithRelations> {
+  const workout = await prisma.workout.findUnique({
+    where: { id: workoutId },
+    include: workoutWithRelations,
+  });
+
+  if (!workout || workout.userId !== userId || workout.deletedAt !== null) {
+    throw new AppError(404, "NOT_FOUND", "ワークアウトが見つかりません");
+  }
+
+  return workout;
+}
