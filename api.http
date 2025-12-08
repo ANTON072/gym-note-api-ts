@@ -28,6 +28,12 @@ Authorization: Bearer {{idToken}}
 
 ###
 
+# GET Exercise by ID
+GET {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
+Authorization: Bearer {{idToken}}
+
+###
+
 # POST Create Exercise
 POST {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
@@ -38,3 +44,23 @@ content-type: application/json
   "bodyPart": 0,
   "laterality": 0
 }
+
+###
+
+# PUT Update Exercise
+PUT {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "name": "Modified Push Up",
+  "bodyPart": 0,
+  "laterality": 0
+}
+
+###
+
+# Delete Exercise
+DELETE {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
+Authorization: Bearer {{idToken}}
+content-type: application/json
