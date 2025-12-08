@@ -1,6 +1,6 @@
 @apiHost = http://localhost:3000
 @emulatorHost = http://127.0.0.1:9099
-@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjUxNzYxODcsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjUxNzYxODcsImV4cCI6MTc2NTE3OTc4NywiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
+@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjUxODA2MDUsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjUxODA2MDUsImV4cCI6MTc2NTE4NDIwNSwiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
 
 ###
 
@@ -25,6 +25,13 @@ Authorization: Bearer {{idToken}}
 # GET Exercises
 GET {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
+
+###
+
+# Search Exercises By Name
+GET {{apiHost}}/api/v1/exercises?name=ベンチ
+Authorization: Bearer {{idToken}}
+
 
 ###
 
