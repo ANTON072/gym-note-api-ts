@@ -144,3 +144,59 @@ content-type: application/json
     }
   ]
 }
+
+###
+
+# PUT Update Workout (既存エクササイズを使用)
+PUT {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "performedStartAt": "2024-01-15T10:00:00Z",
+  "performedEndAt": "2024-01-15T12:00:00Z",
+  "place": "自宅ジム",
+  "note": "メモを更新しました",
+  "workoutExercises": [
+    {
+      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
+      "orderIndex": 1,
+      "workoutSets": [
+        { "weight": 65, "reps": 10 },
+        { "weight": 75, "reps": 8 },
+        { "weight": 80, "reps": 6 }
+      ]
+    }
+  ]
+}
+
+###
+
+# PUT Update Workout (新規エクササイズを作成して更新)
+PUT {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "performedStartAt": "2024-01-15T10:00:00Z",
+  "performedEndAt": "2024-01-15T12:30:00Z",
+  "place": "ジム",
+  "note": "新しい種目を追加",
+  "workoutExercises": [
+    {
+      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
+      "orderIndex": 1,
+      "workoutSets": [
+        { "weight": 60, "reps": 10 }
+      ]
+    },
+    {
+      "exercise": { "name": "インクラインダンベルプレス", "bodyPart": 1, "laterality": 0 },
+      "orderIndex": 2,
+      "workoutSets": [
+        { "weight": 20, "reps": 12 },
+        { "weight": 22, "reps": 10 }
+      ]
+    }
+  ]
+}
