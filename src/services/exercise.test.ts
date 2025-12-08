@@ -75,6 +75,22 @@ describe("エクササイズサービス", () => {
       expect(result).toEqual([]);
       expect(result).toHaveLength(0);
     });
+
+    it("nameを指定した場合、前方一致で検索する", async () => {
+      const filteredExercises = [mockExercises[0]]; // ベンチプレスのみ
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+
+      const result = await fetchExercises("user123", { name: "ベン" });
+
+      expect(prisma.exercise.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: "user123",
+          deletedAt: null,
+          name: { startsWith: "ベン" },
+        },
+      });
+      expect(result).toEqual(filteredExercises);
+    });
   });
 
   describe("fetchExerciseById", () => {

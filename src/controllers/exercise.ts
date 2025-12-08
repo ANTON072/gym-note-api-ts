@@ -18,6 +18,7 @@ import { exerciseRequestSchema } from "@/validators/exercise";
 /**
  * Exercise一覧を取得
  * GET /api/v1/exercises
+ * GET /api/v1/exercises?name=ベン （前方一致検索）
  */
 export async function getExercisesController(
   req: AuthenticatedRequest,
@@ -26,7 +27,8 @@ export async function getExercisesController(
 ): Promise<void> {
   try {
     const user = req.user!;
-    const exercises = await fetchExercises(user.id);
+    const name = req.query.name as string | undefined;
+    const exercises = await fetchExercises(user.id, { name });
     res.status(200).json({ exercises });
   } catch (error) {
     next(error);

@@ -23,10 +23,19 @@ function handleUniqueConstraintError(error: unknown): never {
 
 /**
  * Exercise一覧データを返す
+ * @param userId ユーザーID
+ * @param options.name 名前で前方一致検索（オプション）
  */
-export async function fetchExercises(userId: string): Promise<Exercise[]> {
+export async function fetchExercises(
+  userId: string,
+  options?: { name?: string }
+): Promise<Exercise[]> {
   return await prisma.exercise.findMany({
-    where: { userId, deletedAt: null },
+    where: {
+      userId,
+      deletedAt: null,
+      ...(options?.name && { name: { startsWith: options.name } }),
+    },
   });
 }
 
