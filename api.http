@@ -1,6 +1,6 @@
 @apiHost = http://localhost:3000
 @emulatorHost = http://127.0.0.1:9099
-@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjUxODA2MDUsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjUxODA2MDUsImV4cCI6MTc2NTE4NDIwNSwiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
+@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjUxOTYxNjMsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjUxOTYxNjMsImV4cCI6MTc2NTE5OTc2MywiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
 
 ###
 
@@ -77,3 +77,52 @@ content-type: application/json
 DELETE {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
 Authorization: Bearer {{idToken}}
 content-type: application/json
+
+###
+
+# POST Create Workout (既存エクササイズを使用)
+POST {{apiHost}}/api/v1/workouts
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "performedStartAt": "2024-01-15T10:00:00Z",
+  "performedEndAt": "2024-01-15T11:30:00Z",
+  "place": "ジム",
+  "note": "調子良かった",
+  "workoutExercises": [
+    {
+      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
+      "orderIndex": 1,
+      "workoutSets": [
+        { "weight": 60, "reps": 10 },
+        { "weight": 70, "reps": 8 },
+        { "weight": 75, "reps": 6 }
+      ]
+    }
+  ]
+}
+
+###
+
+# POST Create Workout (新規エクササイズを作成)
+POST {{apiHost}}/api/v1/workouts
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "performedStartAt": "2024-01-16T09:00:00Z",
+  "performedEndAt": null,
+  "place": "自宅",
+  "note": null,
+  "workoutExercises": [
+    {
+      "exercise": { "name": "懸垂（ワイドグリップ）", "bodyPart": 1, "laterality": 0 },
+      "orderIndex": 1,
+      "workoutSets": [
+        { "weight": null, "reps": 10 },
+        { "weight": null, "reps": 8 }
+      ]
+    }
+  ]
+}
