@@ -19,6 +19,7 @@ import { exerciseRequestSchema } from "@/validators/exercise";
  * Exercise一覧を取得
  * GET /api/v1/exercises
  * GET /api/v1/exercises?name=ベン （前方一致検索）
+ * GET /api/v1/exercises?bodyPart=1 （部位でフィルタ）
  */
 export async function getExercisesController(
   req: AuthenticatedRequest,
@@ -28,7 +29,10 @@ export async function getExercisesController(
   try {
     const user = req.user!;
     const name = req.query.name as string | undefined;
-    const exercises = await fetchExercises(user.id, { name });
+    const bodyPartParam = req.query.bodyPart as string | undefined;
+    const bodyPart =
+      bodyPartParam !== undefined ? parseInt(bodyPartParam, 10) : undefined;
+    const exercises = await fetchExercises(user.id, { name, bodyPart });
     res.status(200).json({ exercises });
   } catch (error) {
     next(error);

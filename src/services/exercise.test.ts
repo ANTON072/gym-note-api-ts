@@ -91,6 +91,39 @@ describe("エクササイズサービス", () => {
       });
       expect(result).toEqual(filteredExercises);
     });
+
+    it("bodyPartを指定した場合、部位でフィルタする", async () => {
+      const filteredExercises = [mockExercises[0]]; // bodyPart: 1 のみ
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+
+      const result = await fetchExercises("user123", { bodyPart: 1 });
+
+      expect(prisma.exercise.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: "user123",
+          deletedAt: null,
+          bodyPart: 1,
+        },
+      });
+      expect(result).toEqual(filteredExercises);
+    });
+
+    it("nameとbodyPartを両方指定した場合、両方の条件でフィルタする", async () => {
+      const filteredExercises = [mockExercises[0]];
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+
+      const result = await fetchExercises("user123", { name: "ベン", bodyPart: 1 });
+
+      expect(prisma.exercise.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: "user123",
+          deletedAt: null,
+          name: { startsWith: "ベン" },
+          bodyPart: 1,
+        },
+      });
+      expect(result).toEqual(filteredExercises);
+    });
   });
 
   describe("fetchExerciseById", () => {
