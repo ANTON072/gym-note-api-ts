@@ -5,6 +5,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/config/database";
+import {
+  TEST_USER_ID,
+  mockExercise,
+  mockExerciseList,
+} from "@/__tests__/fixtures/exercise";
 
 import {
   fetchExercises,
@@ -32,118 +37,84 @@ describe("エクササイズサービス", () => {
   });
 
   describe("fetchExercises", () => {
-    const mockExercises = [
-      {
-        id: "exercise1",
-        userId: "user123",
-        name: "ベンチプレス",
-        bodyPart: 1,
-        laterality: null,
-        deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "exercise2",
-        userId: "user123",
-        name: "スクワット",
-        bodyPart: 3,
-        laterality: null,
-        deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-
     it("指定したユーザーのエクササイズ一覧を返す", async () => {
-      vi.mocked(prisma.exercise.findMany).mockResolvedValue(mockExercises);
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue(mockExerciseList);
 
-      const result = await fetchExercises("user123");
+      const result = await fetchExercises(TEST_USER_ID);
 
       expect(prisma.exercise.findMany).toHaveBeenCalledWith({
-        where: { userId: "user123", deletedAt: null },
+        where: { userId: TEST_USER_ID, deletedAt: null },
       });
-      expect(result).toEqual(mockExercises);
+      expect(result).toEqual(mockExerciseList);
       expect(result).toHaveLength(2);
     });
 
     it("エクササイズが存在しない場合、空配列を返す", async () => {
       vi.mocked(prisma.exercise.findMany).mockResolvedValue([]);
 
-      const result = await fetchExercises("user123");
+      const result = await fetchExercises(TEST_USER_ID);
 
       expect(result).toEqual([]);
       expect(result).toHaveLength(0);
     });
 
     it("nameを指定した場合、前方一致で検索する", async () => {
-      const filteredExercises = [mockExercises[0]]; // ベンチプレスのみ
-      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
 
-      const result = await fetchExercises("user123", { name: "ベン" });
+      const result = await fetchExercises(TEST_USER_ID, { name: "ベン" });
 
       expect(prisma.exercise.findMany).toHaveBeenCalledWith({
         where: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           deletedAt: null,
           name: { startsWith: "ベン" },
         },
       });
-      expect(result).toEqual(filteredExercises);
+      expect(result).toEqual([mockExercise]);
     });
 
     it("bodyPartを指定した場合、部位でフィルタする", async () => {
-      const filteredExercises = [mockExercises[0]]; // bodyPart: 1 のみ
-      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
 
-      const result = await fetchExercises("user123", { bodyPart: 1 });
+      const result = await fetchExercises(TEST_USER_ID, { bodyPart: 1 });
 
       expect(prisma.exercise.findMany).toHaveBeenCalledWith({
         where: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           deletedAt: null,
           bodyPart: 1,
         },
       });
-      expect(result).toEqual(filteredExercises);
+      expect(result).toEqual([mockExercise]);
     });
 
     it("nameとbodyPartを両方指定した場合、両方の条件でフィルタする", async () => {
-      const filteredExercises = [mockExercises[0]];
-      vi.mocked(prisma.exercise.findMany).mockResolvedValue(filteredExercises);
+      vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
 
-      const result = await fetchExercises("user123", { name: "ベン", bodyPart: 1 });
+      const result = await fetchExercises(TEST_USER_ID, {
+        name: "ベン",
+        bodyPart: 1,
+      });
 
       expect(prisma.exercise.findMany).toHaveBeenCalledWith({
         where: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           deletedAt: null,
           name: { startsWith: "ベン" },
           bodyPart: 1,
         },
       });
-      expect(result).toEqual(filteredExercises);
+      expect(result).toEqual([mockExercise]);
     });
   });
 
   describe("fetchExerciseById", () => {
-    const mockExercise = {
-      id: "exercise1",
-      userId: "user123",
-      name: "ベンチプレス",
-      bodyPart: 1,
-      laterality: null,
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     it("指定したIDのエクササイズを返す", async () => {
       vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
 
       const result = await fetchExerciseById({
         exerciseId: "exercise1",
-        userId: "user123",
+        userId: TEST_USER_ID,
       });
 
       expect(prisma.exercise.findUnique).toHaveBeenCalledWith({
@@ -158,7 +129,7 @@ describe("エクササイズサービス", () => {
       await expect(
         fetchExerciseById({
           exerciseId: "nonexistent",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
@@ -175,7 +146,7 @@ describe("エクササイズサービス", () => {
       await expect(
         fetchExerciseById({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
@@ -192,7 +163,7 @@ describe("エクササイズサービス", () => {
       await expect(
         fetchExerciseById({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
@@ -202,22 +173,11 @@ describe("エクササイズサービス", () => {
   });
 
   describe("createExercise", () => {
-    const mockExercise = {
-      id: "exercise1",
-      userId: "user123",
-      name: "ベンチプレス",
-      bodyPart: 1,
-      laterality: null,
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     it("エクササイズを作成して返す", async () => {
       vi.mocked(prisma.exercise.create).mockResolvedValue(mockExercise);
 
       const result = await createExercise({
-        userId: "user123",
+        userId: TEST_USER_ID,
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
@@ -227,7 +187,7 @@ describe("エクササイズサービス", () => {
 
       expect(prisma.exercise.create).toHaveBeenCalledWith({
         data: {
-          userId: "user123",
+          userId: TEST_USER_ID,
           name: "ベンチプレス",
           bodyPart: 1,
           laterality: null,
@@ -239,16 +199,13 @@ describe("エクササイズサービス", () => {
     it("同じ名前のエクササイズが存在する場合、CONFLICTエラーをスローする", async () => {
       const prismaError = new Prisma.PrismaClientKnownRequestError(
         "Unique constraint failed",
-        {
-          code: "P2002",
-          clientVersion: "5.0.0",
-        }
+        { code: "P2002", clientVersion: "5.0.0" }
       );
       vi.mocked(prisma.exercise.create).mockRejectedValue(prismaError);
 
       await expect(
         createExercise({
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "ベンチプレス",
             bodyPart: 1,
@@ -268,7 +225,7 @@ describe("エクササイズサービス", () => {
 
       await expect(
         createExercise({
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "ベンチプレス",
             bodyPart: 1,
@@ -280,17 +237,6 @@ describe("エクササイズサービス", () => {
   });
 
   describe("updateExercise", () => {
-    const mockExercise = {
-      id: "exercise1",
-      userId: "user123",
-      name: "ベンチプレス",
-      bodyPart: 1,
-      laterality: null,
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     it("エクササイズを更新して返す", async () => {
       vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
       const updatedExercise = {
@@ -302,7 +248,7 @@ describe("エクササイズサービス", () => {
 
       const result = await updateExercise({
         exerciseId: "exercise1",
-        userId: "user123",
+        userId: TEST_USER_ID,
         exerciseData: {
           name: "ベンチプレス（ワイド）",
           bodyPart: 0,
@@ -330,7 +276,7 @@ describe("エクササイズサービス", () => {
       await expect(
         updateExercise({
           exerciseId: "nonexistent",
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "ベンチプレス",
             bodyPart: 1,
@@ -352,7 +298,7 @@ describe("エクササイズサービス", () => {
       await expect(
         updateExercise({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "ベンチプレス",
             bodyPart: 1,
@@ -374,7 +320,7 @@ describe("エクササイズサービス", () => {
       await expect(
         updateExercise({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "ベンチプレス",
             bodyPart: 1,
@@ -391,17 +337,14 @@ describe("エクササイズサービス", () => {
       vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
       const prismaError = new Prisma.PrismaClientKnownRequestError(
         "Unique constraint failed",
-        {
-          code: "P2002",
-          clientVersion: "5.0.0",
-        }
+        { code: "P2002", clientVersion: "5.0.0" }
       );
       vi.mocked(prisma.exercise.update).mockRejectedValue(prismaError);
 
       await expect(
         updateExercise({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
           exerciseData: {
             name: "スクワット",
             bodyPart: 1,
@@ -416,17 +359,6 @@ describe("エクササイズサービス", () => {
   });
 
   describe("deleteExercise", () => {
-    const mockExercise = {
-      id: "exercise1",
-      userId: "user123",
-      name: "ベンチプレス",
-      bodyPart: 1,
-      laterality: null,
-      deletedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     it("エクササイズを論理削除する", async () => {
       vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
       vi.mocked(prisma.exercise.update).mockResolvedValue({
@@ -436,7 +368,7 @@ describe("エクササイズサービス", () => {
 
       await deleteExercise({
         exerciseId: "exercise1",
-        userId: "user123",
+        userId: TEST_USER_ID,
       });
 
       expect(prisma.exercise.findUnique).toHaveBeenCalledWith({
@@ -456,7 +388,7 @@ describe("エクササイズサービス", () => {
       await expect(
         deleteExercise({
           exerciseId: "nonexistent",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
@@ -473,7 +405,7 @@ describe("エクササイズサービス", () => {
       await expect(
         deleteExercise({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
@@ -490,7 +422,7 @@ describe("エクササイズサービス", () => {
       await expect(
         deleteExercise({
           exerciseId: "exercise1",
-          userId: "user123",
+          userId: TEST_USER_ID,
         })
       ).rejects.toMatchObject({
         statusCode: 404,
