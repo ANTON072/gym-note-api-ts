@@ -9,6 +9,7 @@ import {
   getWorkoutsController,
   createWorkoutController,
   updateWorkoutController,
+  deleteWorkoutController,
 } from "@/controllers/workout";
 import { authMiddleware } from "@/middlewares/auth";
 
@@ -25,5 +26,8 @@ router.post("/", authMiddleware, createWorkoutController);
 
 // PUT /api/v1/workouts/:workoutId - ワークアウト更新
 router.put("/:workoutId", authMiddleware, updateWorkoutController);
+
+// DELETE /api/v1/workouts/:workoutId - ワークアウト削除
+router.delete("/:workoutId", authMiddleware, deleteWorkoutController);
 
 export default router;

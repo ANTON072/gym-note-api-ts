@@ -10,3 +10,4 @@ export type { WorkoutWithRelations, FetchWorkoutsResult } from "./types";
 export { createWorkout } from "./create";
 export { fetchWorkouts, fetchWorkoutById } from "./fetch";
 export { updateWorkout } from "./update";
+export { deleteWorkout } from "./delete";

@@ -10,6 +10,7 @@ import {
   fetchWorkouts,
   fetchWorkoutById,
   updateWorkout,
+  deleteWorkout,
 } from "@/services/workout";
 import { validateRequest } from "@/utils/validation";
 import { workoutRequestSchema } from "@/validators/workout";
@@ -106,6 +107,30 @@ export async function updateWorkoutController(
     });
 
     res.status(200).json({ workout });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Workoutを削除する（論理削除）
+ * DELETE /api/v1/workouts/:workoutId
+ */
+export async function deleteWorkoutController(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { workoutId } = req.params;
+    const user = req.user!;
+
+    await deleteWorkout({
+      workoutId,
+      userId: user.id,
+    });
+
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
