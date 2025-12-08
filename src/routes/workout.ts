@@ -8,6 +8,7 @@ import {
   getWorkoutByIdController,
   getWorkoutsController,
   createWorkoutController,
+  updateWorkoutController,
 } from "@/controllers/workout";
 import { authMiddleware } from "@/middlewares/auth";
 
@@ -21,5 +22,8 @@ router.get("/:workoutId", authMiddleware, getWorkoutByIdController);
 
 // POST /api/v1/workouts - ワークアウト作成
 router.post("/", authMiddleware, createWorkoutController);
+
+// PUT /api/v1/workouts/:workoutId - ワークアウト更新
+router.put("/:workoutId", authMiddleware, updateWorkoutController);
 
 export default router;

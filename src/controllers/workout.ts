@@ -9,6 +9,7 @@ import {
   createWorkout,
   fetchWorkouts,
   fetchWorkoutById,
+  updateWorkout,
 } from "@/services/workout";
 import { validateRequest } from "@/utils/validation";
 import { workoutRequestSchema } from "@/validators/workout";
@@ -79,6 +80,32 @@ export async function createWorkoutController(
     });
 
     res.status(201).json({ workout });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Workoutを更新する
+ * PUT /api/v1/workouts/:workoutId
+ */
+export async function updateWorkoutController(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { workoutId } = req.params;
+    const workoutData = validateRequest(workoutRequestSchema, req.body);
+    const user = req.user!;
+
+    const workout = await updateWorkout({
+      workoutId,
+      userId: user.id,
+      workoutData,
+    });
+
+    res.status(200).json({ workout });
   } catch (error) {
     next(error);
   }
