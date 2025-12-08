@@ -29,13 +29,13 @@ export const workoutExerciseRequestSchema = workoutExerciseSchema
 
 export const workoutSchema = z.object({
   id: z.string(),
-  performedStartAt: z.date(),
-  performedEndAt: z.date().nullable(),
+  performedStartAt: z.coerce.date(),
+  performedEndAt: z.coerce.date().nullable(),
   place: z.string().nullable(),
   note: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  deletedAt: z.date().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date().nullable(),
   workoutExercises: z.array(workoutExerciseSchema),
 });
 
