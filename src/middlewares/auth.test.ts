@@ -3,11 +3,12 @@
  * エラーケースごとに適切なステータスコードが返されることを検証する
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { Prisma } from "@prisma/client";
 
+import { mockUser, mockDecodedToken } from "@/__tests__/fixtures/user";
+
 import { authMiddleware, AuthenticatedRequest } from "./auth";
-import { AppError } from "./errorHandler";
 
 // Firebase Adminのモック
 vi.mock("../config/firebase", () => ({
@@ -100,12 +101,10 @@ describe("認証ミドルウェア", () => {
     it("DB接続エラーの場合", async () => {
       mockReq.headers = { authorization: "Bearer valid_token" };
 
-      const mockDecodedToken = { uid: "firebase123" };
       vi.mocked(admin.auth).mockReturnValue({
         verifyIdToken: vi.fn().mockResolvedValue(mockDecodedToken),
       } as unknown as ReturnType<typeof admin.auth>);
 
-      // PrismaClientInitializationError をシミュレート
       const prismaError = new Prisma.PrismaClientInitializationError(
         "Can't reach database server",
         "2.0.0",
@@ -130,7 +129,6 @@ describe("認証ミドルウェア", () => {
     it("予期しないエラーの場合", async () => {
       mockReq.headers = { authorization: "Bearer valid_token" };
 
-      const mockDecodedToken = { uid: "firebase123" };
       vi.mocked(admin.auth).mockReturnValue({
         verifyIdToken: vi.fn().mockResolvedValue(mockDecodedToken),
       } as unknown as ReturnType<typeof admin.auth>);
@@ -158,21 +156,12 @@ describe("認証ミドルウェア", () => {
     it("認証成功時はnext()が呼ばれ、リクエストにユーザー情報が追加される", async () => {
       mockReq.headers = { authorization: "Bearer valid_token" };
 
-      const mockDecodedToken = { uid: "firebase123" };
       vi.mocked(admin.auth).mockReturnValue({
         verifyIdToken: vi.fn().mockResolvedValue(mockDecodedToken),
       } as unknown as ReturnType<typeof admin.auth>);
 
-      const mockUser = {
-        id: "cuid123",
-        firebaseUid: "firebase123",
-        email: "test@example.com",
-        name: "テストユーザー",
-        imageUrl: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      vi.mocked(findOrCreateUser).mockResolvedValue(mockUser);
+      const mockUserWithNullImage = { ...mockUser, imageUrl: null };
+      vi.mocked(findOrCreateUser).mockResolvedValue(mockUserWithNullImage);
 
       await authMiddleware(
         mockReq as AuthenticatedRequest,
@@ -182,7 +171,7 @@ describe("認証ミドルウェア", () => {
 
       expect(mockNext).toHaveBeenCalledWith();
       expect(mockReq.decodedToken).toEqual(mockDecodedToken);
-      expect(mockReq.user).toEqual(mockUser);
+      expect(mockReq.user).toEqual(mockUserWithNullImage);
     });
   });
 });
