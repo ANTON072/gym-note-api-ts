@@ -200,3 +200,9 @@ content-type: application/json
     }
   ]
 }
+
+###
+
+# DELETE Workout
+DELETE {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
+Authorization: Bearer {{idToken}}
