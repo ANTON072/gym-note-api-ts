@@ -29,8 +29,11 @@ exercise.get("/", async (c) => {
   const user = c.get("user");
   const name = c.req.query("name");
   const bodyPartParam = c.req.query("bodyPart");
-  const bodyPart =
-    bodyPartParam !== undefined ? parseInt(bodyPartParam, 10) : undefined;
+  let bodyPart: number | undefined;
+  if (bodyPartParam !== undefined) {
+    const parsed = parseInt(bodyPartParam, 10);
+    bodyPart = Number.isNaN(parsed) ? undefined : parsed;
+  }
 
   const exercises = await fetchExercises(user.id, { name, bodyPart });
   return c.json({ exercises });
