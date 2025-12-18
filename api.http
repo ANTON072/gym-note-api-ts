@@ -1,8 +1,20 @@
 @apiHost = http://localhost:3000
 @emulatorHost = http://127.0.0.1:9099
-@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjUxOTYxNjMsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjUxOTYxNjMsImV4cCI6MTc2NTE5OTc2MywiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
+@idToken = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJuYW1lIjoidGVzdCB1c2VyIiwicGljdHVyZSI6IiIsImVtYWlsIjoiYmRia3gyODZAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhdXRoX3RpbWUiOjE3NjYwNDExNTcsInVzZXJfaWQiOiJEa3k0ZXRDVTNBc01vejJxYVFncGZHdXZBOU5hIiwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJiZGJreDI4NkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9LCJpYXQiOjE3NjYwNDExNTcsImV4cCI6MTc2NjA0NDc1NywiYXVkIjoiZ3ltLW5vdGUtYXBwIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL2d5bS1ub3RlLWFwcCIsInN1YiI6IkRreTRldENVM0FzTW96MnFhUWdwZkd1dkE5TmEifQ.
+
+# リソースID（APIレスポンスから取得した値に置き換えて使用）
+@exerciseId = your-exercise-id
+@sessionId = your-session-id
+@workoutId = your-workout-id
+@workoutId1 = your-workout-id-1
+@workoutId2 = your-workout-id-2
+@setId1 = your-set-id-1
+@setId2 = your-set-id-2
 
 ###
+# ============================================
+# Firebase Auth
+# ============================================
 
 # Firebase Auth Sign In with Email and Password
 POST {{emulatorHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-api-key
@@ -15,192 +27,201 @@ content-type: application/json
 }
 
 ###
+# ============================================
+# Exercise API (/api/v1/exercises)
+# ============================================
 
-# GET User Data
-GET {{apiHost}}/api/v1/user
-Authorization: Bearer {{idToken}}
-
-###
-
-# GET Exercises
+# GET Exercises - 一覧取得
 GET {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
 
 ###
 
-# Search Exercises By Name
-GET {{apiHost}}/api/v1/exercises?name=ベンチ
+# GET Exercise by ID - 詳細取得
+GET {{apiHost}}/api/v1/exercises/{{exerciseId}}
 Authorization: Bearer {{idToken}}
 
 ###
 
-# Search Exercises By Body Part
-GET {{apiHost}}/api/v1/exercises?bodyPart=1
-Authorization: Bearer {{idToken}}
-
-
-###
-
-# GET Exercise by ID
-GET {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
-Authorization: Bearer {{idToken}}
-
-###
-
-# POST Create Exercise
+# POST Create Exercise - 筋トレ種目を作成
 POST {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
 {
-  "name": "Push Up",
-  "bodyPart": 0
+  "name": "ベンチプレス",
+  "bodyPart": 0,
+  "exerciseType": 0
 }
 
 ###
 
-# PUT Update Exercise
-PUT {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
+# POST Create Exercise - 有酸素種目を作成
+POST {{apiHost}}/api/v1/exercises
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
 {
-  "name": "Modified Push Up",
-  "bodyPart": 0
+  "name": "ランニング",
+  "bodyPart": null,
+  "exerciseType": 1
 }
 
 ###
 
-# Delete Exercise
-DELETE {{apiHost}}/api/v1/exercises/cmihds7ww0001srg93lx5vitn
+# PUT Update Exercise - 種目を更新
+PUT {{apiHost}}/api/v1/exercises/{{exerciseId}}
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
+{
+  "name": "インクラインベンチプレス",
+  "bodyPart": 0,
+  "exerciseType": 0
+}
+
 ###
 
-# GET Workouts
-GET {{apiHost}}/api/v1/workouts
+# DELETE Exercise - 種目を削除
+DELETE {{apiHost}}/api/v1/exercises/{{exerciseId}}
+Authorization: Bearer {{idToken}}
+
+###
+# ============================================
+# Training Session API (/api/v1/training-sessions)
+# ============================================
+
+# GET Training Sessions - 一覧取得
+GET {{apiHost}}/api/v1/training-sessions
 Authorization: Bearer {{idToken}}
 
 ###
 
-# GET Workouts with offset
-GET {{apiHost}}/api/v1/workouts?offset=20
+# GET Training Sessions with offset - ページング
+GET {{apiHost}}/api/v1/training-sessions?offset=20
 Authorization: Bearer {{idToken}}
 
 ###
 
-# GET Workout by ID
-GET {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
+# GET Training Session by ID - 詳細取得
+GET {{apiHost}}/api/v1/training-sessions/{{sessionId}}
 Authorization: Bearer {{idToken}}
 
 ###
 
-# POST Create Workout (既存エクササイズを使用)
-POST {{apiHost}}/api/v1/workouts
+# POST Create Training Session - セッション作成
+POST {{apiHost}}/api/v1/training-sessions
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "performedStartAt": "2024-01-15T10:00:00Z"
+}
+
+###
+
+# PUT Update Training Session - セッション更新
+PUT {{apiHost}}/api/v1/training-sessions/{{sessionId}}
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
 {
   "performedStartAt": "2024-01-15T10:00:00Z",
   "performedEndAt": "2024-01-15T11:30:00Z",
-  "place": "ジム",
+  "place": "ジム"
+}
+
+###
+
+# DELETE Training Session - セッション削除
+DELETE {{apiHost}}/api/v1/training-sessions/{{sessionId}}
+Authorization: Bearer {{idToken}}
+
+###
+# ============================================
+# Workout in Training Session
+# (/api/v1/training-sessions/:sessionId/workouts)
+# ============================================
+
+# POST Add Workout - ワークアウト追加
+POST {{apiHost}}/api/v1/training-sessions/{{sessionId}}/workouts
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+# PATCH Reorder Workouts - ワークアウト並び替え
+PATCH {{apiHost}}/api/v1/training-sessions/{{sessionId}}/workouts/reorder
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
+  "workoutIds": ["{{workoutId1}}", "{{workoutId2}}"]
+}
+
+###
+
+# DELETE Workout from Session - ワークアウト削除
+DELETE {{apiHost}}/api/v1/training-sessions/{{sessionId}}/workouts/{{workoutId}}
+Authorization: Bearer {{idToken}}
+
+###
+# ============================================
+# Workout API (/api/v1/workouts)
+# メモとセットの差分更新
+# ============================================
+
+# PUT Update Workout - 筋トレセット更新
+# weight: グラム単位 (60kg = 60000)
+# reps: 回数
+PUT {{apiHost}}/api/v1/workouts/{{workoutId}}
+Authorization: Bearer {{idToken}}
+content-type: application/json
+
+{
   "note": "調子良かった",
-  "workoutExercises": [
-    {
-      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
-      "orderIndex": 1,
-      "workoutSets": [
-        { "weight": 60, "reps": 10 },
-        { "weight": 70, "reps": 8 },
-        { "weight": 75, "reps": 6 }
-      ]
-    }
+  "sets": [
+    { "weight": 60000, "reps": 10 },
+    { "weight": 70000, "reps": 8 },
+    { "weight": 75000, "reps": 6 }
   ]
 }
 
 ###
 
-# POST Create Workout (新規エクササイズを作成)
-POST {{apiHost}}/api/v1/workouts
+# PUT Update Workout - 既存セット更新 + 新規セット追加
+# id有り → 更新, id無し → 新規作成, リクエストに無いID → 削除
+PUT {{apiHost}}/api/v1/workouts/{{workoutId}}
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
 {
-  "performedStartAt": "2024-01-16T09:00:00Z",
-  "performedEndAt": null,
-  "place": "自宅",
-  "note": null,
-  "workoutExercises": [
-    {
-      "exercise": { "name": "懸垂（ワイドグリップ）", "bodyPart": 1 },
-      "orderIndex": 1,
-      "workoutSets": [
-        { "weight": null, "reps": 10 },
-        { "weight": null, "reps": 8 }
-      ]
-    }
+  "note": "メモを更新",
+  "sets": [
+    { "id": "{{setId1}}", "weight": 65000, "reps": 10 },
+    { "id": "{{setId2}}", "weight": 75000, "reps": 8 },
+    { "weight": 80000, "reps": 6 }
   ]
 }
 
 ###
 
-# PUT Update Workout (既存エクササイズを使用)
-PUT {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
+# PUT Update Workout - 有酸素セット更新
+# distance: メートル単位 (5km = 5000)
+# duration: 秒単位 (30分 = 1800)
+# speed: 0.1 km/h 単位 (10.5 km/h = 105)
+# calories: kcal
+PUT {{apiHost}}/api/v1/workouts/{{workoutId}}
 Authorization: Bearer {{idToken}}
 content-type: application/json
 
 {
-  "performedStartAt": "2024-01-15T10:00:00Z",
-  "performedEndAt": "2024-01-15T12:00:00Z",
-  "place": "自宅ジム",
-  "note": "メモを更新しました",
-  "workoutExercises": [
-    {
-      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
-      "orderIndex": 1,
-      "workoutSets": [
-        { "weight": 65, "reps": 10 },
-        { "weight": 75, "reps": 8 },
-        { "weight": 80, "reps": 6 }
-      ]
-    }
+  "note": "朝ラン",
+  "sets": [
+    { "distance": 5000, "duration": 1800, "speed": 100, "calories": 350 }
   ]
 }
-
-###
-
-# PUT Update Workout (新規エクササイズを作成して更新)
-PUT {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
-Authorization: Bearer {{idToken}}
-content-type: application/json
-
-{
-  "performedStartAt": "2024-01-15T10:00:00Z",
-  "performedEndAt": "2024-01-15T12:30:00Z",
-  "place": "ジム",
-  "note": "新しい種目を追加",
-  "workoutExercises": [
-    {
-      "exercise": { "id": "cmix4ae7s0001sr6wt0yreugy" },
-      "orderIndex": 1,
-      "workoutSets": [
-        { "weight": 60, "reps": 10 }
-      ]
-    },
-    {
-      "exercise": { "name": "インクラインダンベルプレス", "bodyPart": 1 },
-      "orderIndex": 2,
-      "workoutSets": [
-        { "weight": 20, "reps": 12 },
-        { "weight": 22, "reps": 10 }
-      ]
-    }
-  ]
-}
-
-###
-
-# DELETE Workout
-DELETE {{apiHost}}/api/v1/workouts/cmix4ae880003sr6ww6agkxal
-Authorization: Bearer {{idToken}}

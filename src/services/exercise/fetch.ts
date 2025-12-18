@@ -3,23 +3,20 @@
  * プリセット種目とユーザーのカスタム種目を取得する
  */
 import { prisma } from "@/config/database";
-import type { Exercise } from "@/validators/exercise";
+import type { ExerciseInternal } from "@/schemas/exercise";
 
 import { findExerciseForUser } from "./types";
 
-/** isPreset を含む Exercise 型 */
-export type ExerciseWithPreset = Exercise & { isPreset: boolean };
+/** isPreset を含む Exercise 型（サービス層用） */
+export type ExerciseWithPreset = ExerciseInternal;
 
 /**
  * Exercise一覧データを返す
  * プリセット種目とユーザーのカスタム種目の両方を返す
  * @param userId ユーザーID
- * @param options.name 名前で前方一致検索（オプション）
- * @param options.bodyPart 部位でフィルタ（オプション）
  */
 export async function fetchExercises(
-  userId: string,
-  options?: { name?: string; bodyPart?: number }
+  userId: string
 ): Promise<ExerciseWithPreset[]> {
   return await prisma.exercise.findMany({
     where: {
@@ -28,8 +25,6 @@ export async function fetchExercises(
         { userId }, // ユーザーのカスタム種目
       ],
       deletedAt: null,
-      ...(options?.name && { name: { startsWith: options.name } }),
-      ...(options?.bodyPart !== undefined && { bodyPart: options.bodyPart }),
     },
     orderBy: [{ isPreset: "desc" }, { name: "asc" }], // プリセット種目を先に表示
   });

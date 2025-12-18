@@ -52,58 +52,6 @@ describe("fetchExercises", () => {
     expect(result).toEqual([]);
     expect(result).toHaveLength(0);
   });
-
-  it("nameを指定した場合、前方一致で検索する", async () => {
-    vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
-
-    const result = await fetchExercises(TEST_USER_ID, { name: "ベン" });
-
-    expect(prisma.exercise.findMany).toHaveBeenCalledWith({
-      where: {
-        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
-        deletedAt: null,
-        name: { startsWith: "ベン" },
-      },
-      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
-    });
-    expect(result).toEqual([mockExercise]);
-  });
-
-  it("bodyPartを指定した場合、部位でフィルタする", async () => {
-    vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
-
-    const result = await fetchExercises(TEST_USER_ID, { bodyPart: 1 });
-
-    expect(prisma.exercise.findMany).toHaveBeenCalledWith({
-      where: {
-        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
-        deletedAt: null,
-        bodyPart: 1,
-      },
-      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
-    });
-    expect(result).toEqual([mockExercise]);
-  });
-
-  it("nameとbodyPartを両方指定した場合、両方の条件でフィルタする", async () => {
-    vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
-
-    const result = await fetchExercises(TEST_USER_ID, {
-      name: "ベン",
-      bodyPart: 1,
-    });
-
-    expect(prisma.exercise.findMany).toHaveBeenCalledWith({
-      where: {
-        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
-        deletedAt: null,
-        name: { startsWith: "ベン" },
-        bodyPart: 1,
-      },
-      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
-    });
-    expect(result).toEqual([mockExercise]);
-  });
 });
 
 describe("fetchExerciseById", () => {

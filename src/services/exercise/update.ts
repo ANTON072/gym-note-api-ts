@@ -3,7 +3,7 @@
  * プリセット種目は編集不可
  */
 import { prisma } from "@/config/database";
-import type { Exercise, ExerciseRequest } from "@/validators/exercise";
+import type { ExerciseInternal, ExerciseRequest } from "@/schemas/exercise";
 
 import {
   assertNotPreset,
@@ -23,7 +23,7 @@ export async function updateExercise({
   exerciseId: string;
   userId: string;
   exerciseData: ExerciseRequest;
-}): Promise<Exercise> {
+}): Promise<ExerciseInternal> {
   const existing = await findExerciseForUser(exerciseId, userId);
   assertNotPreset(existing, "edit");
 
