@@ -2,17 +2,18 @@
 
 ## プロジェクト概要
 
-**Gym Note Api**は、筋トレのログを記録するノートアプリの API です。Node.js / Express / TypeScript で構築されています。
+**Gym Note Api**は、筋トレのログを記録するノートアプリの API です。Node.js / Hono / TypeScript で構築されています。
 
 - **アプリ名:** Gym Note Api
 - **主要機能:** 筋トレのログを登録・一覧・編集・削除
 
 ## 技術スタック
 
-- **フレームワーク:** Express / TypeScript
+- **フレームワーク:** Hono / TypeScript
+- **サーバー:** @hono/node-server（Node.js環境）
 - **データベース:** MariaDB
 - **ORM:** Prisma
-- **バリデーション:** Zod
+- **バリデーション:** Zod + @hono/zod-validator
 
 ## 認証システム
 
@@ -31,25 +32,34 @@ gym-note-api-ts/
 │   │   ├── database.ts      # Prismaクライアント
 │   │   ├── env.ts           # 環境変数（Zodバリデーション）
 │   │   └── firebase.ts      # Firebase Admin SDK初期化
-│   ├── controllers/         # コントローラー
 │   ├── middlewares/
-│   │   ├── auth.ts          # Firebase認証ミドルウェア
-│   │   └── errorHandler.ts  # グローバルエラーハンドラー
-│   ├── routes/              # ルート定義
+│   │   └── auth.ts          # Firebase認証ミドルウェア
+│   ├── routes/              # ルート定義（ハンドラー統合）
+│   │   ├── health.ts
+│   │   ├── user.ts
+│   │   ├── exercise.ts
+│   │   └── workout.ts
 │   ├── services/            # ビジネスロジック
-│   │   ├── exercise.ts      # 単一ファイル形式
-│   │   └── workout/         # ディレクトリ形式（大きなサービス）
-│   │       ├── index.ts     # re-export
-│   │       ├── types.ts     # 共通の型・定数
-│   │       ├── create.ts    # 作成処理
-│   │       ├── fetch.ts     # 取得処理
-│   │       ├── update.ts    # 更新処理
-│   │       └── delete.ts    # 削除処理
+│   │   ├── user.ts          # 単一ファイル形式
+│   │   ├── exercise/        # ディレクトリ形式
+│   │   │   ├── index.ts     # re-export
+│   │   │   ├── types.ts     # 共通の型・定数
+│   │   │   ├── create.ts    # 作成処理
+│   │   │   ├── fetch.ts     # 取得処理
+│   │   │   ├── update.ts    # 更新処理
+│   │   │   └── delete.ts    # 削除処理
+│   │   └── workout/         # ディレクトリ形式
+│   │       ├── index.ts
+│   │       ├── types.ts
+│   │       ├── create.ts
+│   │       ├── fetch.ts
+│   │       ├── update.ts
+│   │       └── delete.ts
 │   ├── types/               # 型定義
-│   ├── utils/
-│   │   └── validation.ts    # バリデーションユーティリティ
+│   │   ├── exercise.ts
+│   │   └── hono.ts          # Hono用型定義（AuthEnv）
 │   ├── validators/          # Zodスキーマ
-│   ├── app.ts               # Expressアプリ設定
+│   ├── app.ts               # Honoアプリ設定
 │   └── index.ts             # エントリーポイント
 ├── .env.example             # 環境変数テンプレート
 ├── eslint.config.mjs        # ESLint設定
@@ -59,7 +69,7 @@ gym-note-api-ts/
 
 ### サービスのファイル構成
 
-- **小規模なサービス:** 単一ファイル（例: `services/exercise.ts`）
+- **小規模なサービス:** 単一ファイル（例: `services/user.ts`）
 - **大規模なサービス:** ディレクトリに分割（例: `services/workout/`）
   - `index.ts` で関数をre-exportし、インポート側は `@/services/workout` で統一
 
@@ -133,28 +143,27 @@ z.string().url();
 
 - 各ファイルの冒頭には日本語のコメントで仕様を記述する
 
-### Controller / Service の命名規則
+### Routes / Service の命名規則
 
-- **Controller 関数:** サフィックスに `Controller` をつける（例: `getExercisesController`, `createExerciseController`）
 - **Service 関数:** シンプルな名前を使用（例: `fetchExercises`, `createExercise`）
-- これにより検索時に Controller と Service を区別しやすくなる
+- **Routes:** ルートとハンドラーを統合（Hono推奨スタイル）
 
 ### レイヤーの責務
 
-| レイヤー | 責務 |
-| --- | --- |
-| Controller | HTTP リクエスト/レスポンス処理、バリデーション（形式チェック） |
-| Service | ビジネスロジック、DB 操作、外部サービス連携 |
+| レイヤー | 責務                                        |
+| -------- | ------------------------------------------- |
+| Routes   | ルート定義、ハンドラー、バリデーション      |
+| Service  | ビジネスロジック、DB 操作、外部サービス連携 |
 
-- **バリデーション:** Controller で `validateRequest()` ユーティリティを使用
+- **バリデーション:** Routes で `zValidator()` を使用
 - **ビジネスルールの検証:** Service で実施（重複チェック、権限、整合性など）
-- **Prisma エラー（P2002 など）のハンドリング:** Service で AppError に変換
+- **エラーハンドリング:** Service で `HTTPException` をスロー
 
 ### 認証ミドルウェア
 
-- `req.decodedToken`: Firebase の DecodedIdToken（JWT の中身）
-- `req.user`: DB の User オブジェクト（認証ミドルウェアで取得済み）
-- Controller では `req.user!` から直接ユーザー情報を取得する
+- `c.get("decodedToken")`: Firebase の DecodedIdToken（JWT の中身）
+- `c.get("user")`: DB の User オブジェクト（認証ミドルウェアで取得済み）
+- ルートハンドラーでは `c.get("user")` から直接ユーザー情報を取得する
 
 ### API レスポンス規約
 
@@ -162,72 +171,44 @@ z.string().url();
 
 エラー発生時は HTTP ステータスコードとともに、以下の形式でレスポンスを返す。
 
-```typescript
-{
-  "error": {
-    "code": string,      // 内部エラーコード（例: "VALIDATION_ERROR"）
-    "message": string,   // エラーメッセージ
-    "details"?: object   // サービス毎の詳細エラー情報（任意）
-  }
-}
-```
-
-**内部エラーコード一覧:**
-
-| HTTP ステータス | code             | 説明                   |
-| --------------- | ---------------- | ---------------------- |
-| 400             | VALIDATION_ERROR | リクエストの形式が不正 |
-| 401             | UNAUTHORIZED     | 認証エラー             |
-| 403             | FORBIDDEN        | アクセス権限なし       |
-| 404             | NOT_FOUND        | リソースが見つからない |
-| 409             | CONFLICT         | リソースの競合（重複など） |
-| 500             | INTERNAL_ERROR   | サーバー内部エラー     |
-
-**例: 基本的なエラーレスポンス**
+**HTTPException エラー（認証・ビジネスロジックエラー）:**
 
 ```json
 {
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "指定されたリソースが見つかりません"
-  }
+  "message": "エラーメッセージ"
 }
 ```
 
-**例: 詳細情報を含むバリデーションエラー**
+**バリデーションエラー（zValidator）:**
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "入力内容に誤りがあります",
-    "details": {
-      "fields": [
-        {
-          "field": "email",
-          "message": "メールアドレスの形式が正しくありません"
-        },
-        { "field": "name", "message": "名前は必須です" }
-      ]
-    }
+    "issues": [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "received": "undefined",
+        "path": ["name"],
+        "message": "Required"
+      }
+    ],
+    "name": "ZodError"
   }
 }
 ```
 
-**例: 外部サービスエラーの詳細**
+**HTTPステータスコード:**
 
-```json
-{
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "外部サービスとの通信に失敗しました",
-    "details": {
-      "service": "firebase",
-      "originalError": "auth/user-not-found"
-    }
-  }
-}
-```
+| HTTP ステータス | 説明                       |
+| --------------- | -------------------------- |
+| 400             | リクエストの形式が不正     |
+| 401             | 認証エラー                 |
+| 403             | アクセス権限なし           |
+| 404             | リソースが見つからない     |
+| 409             | リソースの競合（重複など） |
+| 500             | サーバー内部エラー         |
 
 #### ページングレスポンス
 
@@ -283,6 +264,8 @@ z.string().url();
 
 ## 参考リンク
 
-- [Express \- Node\.js web application framework](https://expressjs.com/)
+- [Hono Documentation](https://hono.dev/)
+- [Hono Node.js Adapter](https://hono.dev/docs/getting-started/nodejs)
+- [@hono/zod-validator](https://hono.dev/docs/guides/validation#with-zod)
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Firebase Authentication](https://firebase.google.com/docs/auth?hl=ja)
