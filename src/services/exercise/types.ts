@@ -2,24 +2,22 @@
  * エクササイズサービス共通の型・ヘルパー関数
  */
 import { Prisma } from "@prisma/client";
+import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
-import { AppError } from "@/middlewares/errorHandler";
 import type { Exercise } from "@/validators/exercise";
 
 /**
- * Prismaのユニーク制約エラー（P2002）をAppErrorに変換する
+ * Prismaのユニーク制約エラー（P2002）をHTTPExceptionに変換する
  */
 export function handleUniqueConstraintError(error: unknown): never {
   if (
     error instanceof Prisma.PrismaClientKnownRequestError &&
     error.code === "P2002"
   ) {
-    throw new AppError(
-      409,
-      "CONFLICT",
-      "同じ名前のエクササイズが既に存在します"
-    );
+    throw new HTTPException(409, {
+      message: "同じ名前のエクササイズが既に存在します",
+    });
   }
   throw error;
 }
@@ -36,7 +34,7 @@ export async function findExerciseForUser(
   });
 
   if (!exercise || exercise.userId !== userId || exercise.deletedAt !== null) {
-    throw new AppError(404, "NOT_FOUND", "エクササイズが見つかりません");
+    throw new HTTPException(404, { message: "エクササイズが見つかりません" });
   }
 
   return exercise;

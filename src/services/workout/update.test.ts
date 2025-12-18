@@ -188,8 +188,7 @@ describe("updateWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -212,8 +211,7 @@ describe("updateWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -236,8 +234,7 @@ describe("updateWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -269,8 +266,7 @@ describe("updateWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 400,
-      code: "VALIDATION_ERROR",
+      status: 400,
     });
   });
 });

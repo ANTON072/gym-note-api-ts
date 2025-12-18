@@ -1,31 +1,26 @@
 /**
- * Expressアプリケーションの設定
+ * Honoアプリケーションの設定
  * ミドルウェアとルートの設定を行う
  */
-import express, { Application } from "express";
-import cors from "cors";
-import helmet from "helmet";
-import { errorHandler } from "./middlewares/errorHandler";
-import healthRouter from "./routes/health";
-import userRouter from "./routes/user";
-import exerciseRouter from "./routes/exercise";
-import workoutRouter from "./routes/workout";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { secureHeaders } from "hono/secure-headers";
 
-const app: Application = express();
+import health from "./routes/health";
+import user from "./routes/user";
+import exercise from "./routes/exercise";
+import workout from "./routes/workout";
 
-// ミドルウェアの設定
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const app = new Hono();
 
-// ルートの設定
-app.use("/health", healthRouter);
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/exercises", exerciseRouter);
-app.use("/api/v1/workouts", workoutRouter);
+// ミドルウェア
+app.use("*", secureHeaders());
+app.use("*", cors());
 
-// エラーハンドリング
-app.use(errorHandler);
+// ルート
+app.route("/health", health);
+app.route("/api/v1/user", user);
+app.route("/api/v1/exercises", exercise);
+app.route("/api/v1/workouts", workout);
 
 export default app;

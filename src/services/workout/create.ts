@@ -1,8 +1,9 @@
 /**
  * ワークアウト作成サービス
  */
+import { HTTPException } from "hono/http-exception";
+
 import { prisma } from "@/config/database";
-import { AppError } from "@/middlewares/errorHandler";
 import type { WorkoutRequest } from "@/validators/workout";
 
 import {
@@ -52,11 +53,9 @@ export async function createWorkout({
     );
 
     if (invalidIds.length > 0) {
-      throw new AppError(
-        400,
-        "VALIDATION_ERROR",
-        `無効なエクササイズIDが含まれています: ${invalidIds.join(", ")}`
-      );
+      throw new HTTPException(400, {
+        message: `無効なエクササイズIDが含まれています: ${invalidIds.join(", ")}`,
+      });
     }
   }
 

@@ -55,8 +55,7 @@ describe("deleteExercise", () => {
         userId: TEST_USER_ID,
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -72,8 +71,7 @@ describe("deleteExercise", () => {
         userId: TEST_USER_ID,
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -89,8 +87,7 @@ describe("deleteExercise", () => {
         userId: TEST_USER_ID,
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 });

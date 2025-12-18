@@ -1,20 +1,19 @@
 /**
  * ヘルスチェックルート
- * アプリケーションの稼働状態を確認するためのエンドポイント
  */
-import { Router, Request, Response } from "express";
+import { Hono } from "hono";
 
-const router = Router();
+const health = new Hono();
 
 /**
  * GET /health
- * アプリケーションのヘルスステータスを返す
+ * ヘルスチェック
  */
-router.get("/", (_req: Request, res: Response) => {
-  res.json({
+health.get("/", (c) => {
+  return c.json({
     status: "ok",
     timestamp: new Date().toISOString(),
   });
 });
 
-export default router;
+export default health;
