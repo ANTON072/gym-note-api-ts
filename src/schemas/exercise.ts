@@ -1,5 +1,5 @@
 /**
- * Exercise OpenAPI スキーマ定義
+ * 種目（Exercise）のバリデーションスキーマ
  */
 import { z } from "@hono/zod-openapi";
 
@@ -24,14 +24,8 @@ export const exerciseSchema = z
       .max(1)
       .openapi({ description: "種類（0:筋トレ, 1:有酸素）" }),
     isPreset: z.boolean().openapi({ description: "プリセット種目かどうか" }),
-    createdAt: z
-      .string()
-      .datetime()
-      .openapi({ example: "2024-01-01T00:00:00Z" }),
-    updatedAt: z
-      .string()
-      .datetime()
-      .openapi({ example: "2024-01-01T00:00:00Z" }),
+    createdAt: z.iso.datetime().openapi({ example: "2024-01-01T00:00:00Z" }),
+    updatedAt: z.iso.datetime().openapi({ example: "2024-01-01T00:00:00Z" }),
   })
   .openapi("Exercise");
 
@@ -83,3 +77,7 @@ export const exerciseRequestSchema = z
 export const exerciseIdParamSchema = z.object({
   exerciseId: z.string().openapi({ param: { name: "exerciseId", in: "path" } }),
 });
+
+// 型エクスポート
+export type Exercise = z.infer<typeof exerciseSchema>;
+export type ExerciseRequest = z.infer<typeof exerciseRequestSchema>;

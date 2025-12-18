@@ -18,11 +18,11 @@ import {
   exerciseDetailResponseSchema,
   exerciseRequestSchema,
   exerciseIdParamSchema,
-} from "@/openapi/schemas/exercise";
+} from "@/schemas/exercise";
 import {
   errorResponseSchema,
   messageResponseSchema,
-} from "@/openapi/schemas/common";
+} from "@/schemas/common";
 
 const exercise = new OpenAPIHono<AuthEnv>();
 

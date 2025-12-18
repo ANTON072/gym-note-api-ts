@@ -1,11 +1,27 @@
 /**
- * TrainingSession OpenAPI スキーマ定義
+ * トレーニングセッション（TrainingSession）のバリデーションスキーマ
+ * トレーニング日（日付、場所、時間）を表す
  */
 import { z } from "@hono/zod-openapi";
 import { pagingSchema } from "./common";
 
 /**
- * ワークアウトセットスキーマ
+ * Exercise（ワークアウト内で使用）
+ */
+const workoutExerciseSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    bodyPart: z.number().int().nullable(),
+    exerciseType: z.number().int(),
+    isPreset: z.boolean(),
+  })
+  .openapi("WorkoutExercise");
+
+/**
+ * セット記録スキーマ（レスポンス用）
+ * 筋トレ用: weight, reps
+ * 有酸素用: distance, duration, speed, calories
  */
 export const workoutSetSchema = z
   .object({
@@ -16,7 +32,12 @@ export const workoutSetSchema = z
       .min(0)
       .nullable()
       .openapi({ description: "重量（グラム）" }),
-    reps: z.number().int().min(0).nullable().openapi({ description: "回数" }),
+    reps: z
+      .number()
+      .int()
+      .min(0)
+      .nullable()
+      .openapi({ description: "回数" }),
     distance: z
       .number()
       .int()
@@ -45,7 +66,10 @@ export const workoutSetSchema = z
   .openapi("WorkoutSet");
 
 /**
- * ワークアウトセットリクエストスキーマ（作成/更新用）
+ * セット記録リクエストスキーマ（更新用）
+ * - id有り → 更新
+ * - id無し → 新規作成
+ * - リクエストに無いID → 削除
  */
 export const workoutSetRequestSchema = z
   .object({
@@ -99,20 +123,8 @@ export const workoutSetRequestSchema = z
   .openapi("WorkoutSetRequest");
 
 /**
- * Exercise（ワークアウト内で使用）
- */
-const workoutExerciseSchema = z
-  .object({
-    id: z.string(),
-    name: z.string(),
-    bodyPart: z.number().int().nullable(),
-    exerciseType: z.number().int(),
-    isPreset: z.boolean(),
-  })
-  .openapi("WorkoutExercise");
-
-/**
  * ワークアウトスキーマ（レスポンス用）
+ * 1つの種目の実施記録（種目＋セット群＋メモ）
  */
 export const workoutSchema = z
   .object({
@@ -125,23 +137,53 @@ export const workoutSchema = z
   .openapi("Workout");
 
 /**
+ * ワークアウト追加リクエストスキーマ
+ * POST /api/v1/training-sessions/:sessionId/workouts
+ */
+export const workoutAddRequestSchema = z
+  .object({
+    exerciseId: z.string().openapi({ example: "clxyz123456789" }),
+  })
+  .openapi("WorkoutAddRequest");
+
+/**
+ * ワークアウト更新リクエストスキーマ
+ * PUT /api/v1/workouts/:workoutId
+ * メモとセットを差分更新
+ */
+export const workoutUpdateRequestSchema = z
+  .object({
+    note: z.string().nullable().optional(),
+    sets: z.array(workoutSetRequestSchema).optional(),
+  })
+  .openapi("WorkoutUpdateRequest");
+
+/**
+ * ワークアウト並び替えリクエストスキーマ
+ * PATCH /api/v1/training-sessions/:sessionId/workouts/reorder
+ */
+export const workoutReorderRequestSchema = z
+  .object({
+    workoutIds: z.array(z.string()),
+  })
+  .openapi("WorkoutReorderRequest");
+
+/**
  * トレーニングセッションスキーマ（レスポンス用）
  */
 export const trainingSessionSchema = z
   .object({
     id: z.string().openapi({ example: "clxyz123456789" }),
-    performedStartAt: z
-      .string()
+    performedStartAt: z.iso
       .datetime()
       .openapi({ example: "2024-01-01T09:00:00Z" }),
-    performedEndAt: z
-      .string()
+    performedEndAt: z.iso
       .datetime()
       .nullable()
       .openapi({ example: "2024-01-01T10:30:00Z" }),
     place: z.string().nullable().openapi({ example: "ジム" }),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
     workouts: z.array(workoutSchema),
   })
   .openapi("TrainingSession");
@@ -158,11 +200,11 @@ export const trainingSessionListResponseSchema = z
 
 /**
  * トレーニングセッション作成リクエストスキーマ
+ * POST /api/v1/training-sessions
  */
 export const trainingSessionCreateRequestSchema = z
   .object({
-    performedStartAt: z
-      .string()
+    performedStartAt: z.iso
       .datetime()
       .openapi({ example: "2024-01-01T09:00:00Z" }),
   })
@@ -170,42 +212,15 @@ export const trainingSessionCreateRequestSchema = z
 
 /**
  * トレーニングセッション更新リクエストスキーマ
+ * PUT /api/v1/training-sessions/:sessionId
  */
 export const trainingSessionUpdateRequestSchema = z
   .object({
-    performedStartAt: z.string().datetime().optional(),
-    performedEndAt: z.string().datetime().nullable().optional(),
+    performedStartAt: z.iso.datetime().optional(),
+    performedEndAt: z.iso.datetime().nullable().optional(),
     place: z.string().nullable().optional(),
   })
   .openapi("TrainingSessionUpdateRequest");
-
-/**
- * ワークアウト追加リクエストスキーマ
- */
-export const workoutAddRequestSchema = z
-  .object({
-    exerciseId: z.string().openapi({ example: "clxyz123456789" }),
-  })
-  .openapi("WorkoutAddRequest");
-
-/**
- * ワークアウト並び替えリクエストスキーマ
- */
-export const workoutReorderRequestSchema = z
-  .object({
-    workoutIds: z.array(z.string()),
-  })
-  .openapi("WorkoutReorderRequest");
-
-/**
- * ワークアウト更新リクエストスキーマ
- */
-export const workoutUpdateRequestSchema = z
-  .object({
-    note: z.string().nullable().optional(),
-    sets: z.array(workoutSetRequestSchema).optional(),
-  })
-  .openapi("WorkoutUpdateRequest");
 
 /**
  * パスパラメータスキーマ
@@ -234,3 +249,18 @@ export const trainingSessionQuerySchema = z.object({
     .optional()
     .openapi({ param: { name: "offset", in: "query" } }),
 });
+
+// 型エクスポート
+export type TrainingSession = z.infer<typeof trainingSessionSchema>;
+export type TrainingSessionCreateRequest = z.infer<
+  typeof trainingSessionCreateRequestSchema
+>;
+export type TrainingSessionUpdateRequest = z.infer<
+  typeof trainingSessionUpdateRequestSchema
+>;
+export type Workout = z.infer<typeof workoutSchema>;
+export type WorkoutAddRequest = z.infer<typeof workoutAddRequestSchema>;
+export type WorkoutUpdateRequest = z.infer<typeof workoutUpdateRequestSchema>;
+export type WorkoutReorderRequest = z.infer<typeof workoutReorderRequestSchema>;
+export type WorkoutSet = z.infer<typeof workoutSetSchema>;
+export type WorkoutSetRequest = z.infer<typeof workoutSetRequestSchema>;

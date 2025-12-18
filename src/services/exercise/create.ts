@@ -2,7 +2,7 @@
  * エクササイズ作成サービス
  */
 import { prisma } from "@/config/database";
-import type { Exercise, ExerciseRequest } from "@/validators/exercise";
+import type { Exercise, ExerciseRequest } from "@/schemas/exercise";
 
 import { handleUniqueConstraintError } from "./types";
 

@@ -3,7 +3,7 @@
  * プリセット種目は編集不可
  */
 import { prisma } from "@/config/database";
-import type { Exercise, ExerciseRequest } from "@/validators/exercise";
+import type { Exercise, ExerciseRequest } from "@/schemas/exercise";
 
 import {
   assertNotPreset,

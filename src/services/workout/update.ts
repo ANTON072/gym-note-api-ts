@@ -6,7 +6,7 @@
 import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
-import type { WorkoutSetRequest } from "@/validators/training-session";
+import type { WorkoutSetRequest } from "@/schemas/training-session";
 
 import { workoutWithRelations, WorkoutWithRelations } from "./types";
 

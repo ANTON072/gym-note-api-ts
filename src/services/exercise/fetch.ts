@@ -3,7 +3,7 @@
  * プリセット種目とユーザーのカスタム種目を取得する
  */
 import { prisma } from "@/config/database";
-import type { Exercise } from "@/validators/exercise";
+import type { Exercise } from "@/schemas/exercise";
 
 import { findExerciseForUser } from "./types";
 

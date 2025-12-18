@@ -2,7 +2,7 @@
  * Hono用の型定義
  * 認証済みルートで使用する環境型
  */
-import type { User } from "@/validators/user";
+import type { User } from "@/schemas/user";
 import type { admin } from "@/config/firebase";
 
 /**

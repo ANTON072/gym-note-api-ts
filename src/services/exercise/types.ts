@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
-import type { Exercise } from "@/validators/exercise";
+import type { Exercise } from "@/schemas/exercise";
 
 /**
  * Prismaのユニーク制約エラー（P2002）をHTTPExceptionに変換する
