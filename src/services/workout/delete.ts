@@ -1,8 +1,9 @@
 /**
  * ワークアウト削除サービス
  */
+import { HTTPException } from "hono/http-exception";
+
 import { prisma } from "@/config/database";
-import { AppError } from "@/middlewares/errorHandler";
 
 /**
  * ワークアウトを論理削除する
@@ -25,7 +26,7 @@ export async function deleteWorkout({
     existingWorkout.userId !== userId ||
     existingWorkout.deletedAt !== null
   ) {
-    throw new AppError(404, "NOT_FOUND", "ワークアウトが見つかりません");
+    throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 
   // 論理削除（deletedAtを設定）

@@ -1,8 +1,9 @@
 /**
  * ワークアウト取得サービス
  */
+import { HTTPException } from "hono/http-exception";
+
 import { prisma } from "@/config/database";
-import { AppError } from "@/middlewares/errorHandler";
 
 import {
   workoutWithRelations,
@@ -61,7 +62,7 @@ export async function fetchWorkoutById({
   });
 
   if (!workout || workout.userId !== userId || workout.deletedAt !== null) {
-    throw new AppError(404, "NOT_FOUND", "ワークアウトが見つかりません");
+    throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 
   return workout;

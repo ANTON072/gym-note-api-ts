@@ -63,8 +63,7 @@ describe("createExercise", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 409,
-      code: "CONFLICT",
+      status: 409,
       message: "同じ名前のエクササイズが既に存在します",
     });
   });

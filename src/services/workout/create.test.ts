@@ -33,7 +33,9 @@ describe("createWorkout", () => {
 
   it("既存エクササイズを使ってワークアウトを作成できる", async () => {
     vi.mocked(prisma.exercise.findMany).mockResolvedValue([mockExercise]);
-    vi.mocked(prisma.workout.create).mockResolvedValue(mockWorkoutWithRelations);
+    vi.mocked(prisma.workout.create).mockResolvedValue(
+      mockWorkoutWithRelations
+    );
 
     const result = await createWorkout({
       userId: TEST_USER_ID,
@@ -116,7 +118,9 @@ describe("createWorkout", () => {
         },
       ],
     };
-    vi.mocked(prisma.workout.create).mockResolvedValue(mockWorkoutWithNewExercise);
+    vi.mocked(prisma.workout.create).mockResolvedValue(
+      mockWorkoutWithNewExercise
+    );
 
     const result = await createWorkout({
       userId: TEST_USER_ID,
@@ -152,7 +156,9 @@ describe("createWorkout", () => {
       ...mockWorkoutWithRelations,
       workoutExercises: [],
     };
-    vi.mocked(prisma.workout.create).mockResolvedValue(mockWorkoutWithoutExercises);
+    vi.mocked(prisma.workout.create).mockResolvedValue(
+      mockWorkoutWithoutExercises
+    );
 
     const result = await createWorkout({
       userId: TEST_USER_ID,
@@ -191,8 +197,7 @@ describe("createWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 400,
-      code: "VALIDATION_ERROR",
+      status: 400,
     });
   });
 
@@ -217,8 +222,7 @@ describe("createWorkout", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 400,
-      code: "VALIDATION_ERROR",
+      status: 400,
     });
   });
 });

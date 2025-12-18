@@ -71,8 +71,7 @@ describe("updateExercise", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -93,8 +92,7 @@ describe("updateExercise", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -115,8 +113,7 @@ describe("updateExercise", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 404,
-      code: "NOT_FOUND",
+      status: 404,
     });
   });
 
@@ -139,8 +136,7 @@ describe("updateExercise", () => {
         },
       })
     ).rejects.toMatchObject({
-      statusCode: 409,
-      code: "CONFLICT",
+      status: 409,
     });
   });
 });

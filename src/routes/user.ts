@@ -2,15 +2,23 @@
  * User routes
  * /api/v1/user
  */
+import { Hono } from "hono";
 
-import { Router } from "express";
-
+import type { AuthEnv } from "@/types/hono";
 import { authMiddleware } from "@/middlewares/auth";
-import { getCurrentUserController } from "@/controllers/user";
 
-const router = Router();
+const user = new Hono<AuthEnv>();
 
-// GET /api/v1/user
-router.get("/", authMiddleware, getCurrentUserController);
+// 全ルートに認証を適用
+user.use("*", authMiddleware);
 
-export default router;
+/**
+ * GET /api/v1/user
+ * 現在のユーザー情報を取得
+ */
+user.get("/", (c) => {
+  const currentUser = c.get("user");
+  return c.json({ user: currentUser });
+});
+
+export default user;

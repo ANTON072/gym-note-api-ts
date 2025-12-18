@@ -1,67 +1,40 @@
 /**
  * Firebase認証ミドルウェア
- * JWTトークンを検証し、ユーザー情報をリクエストに追加する
+ * JWTトークンを検証し、ユーザー情報をコンテキストに追加する
  */
-import { Request, Response, NextFunction } from "express";
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
 import { admin, initializeFirebase } from "@/config/firebase";
-import { AppError } from "./errorHandler";
 import { findOrCreateUser } from "@/services/user";
-import { User } from "@/validators/user";
+import type { AuthEnv } from "@/types/hono";
 
 // Firebase初期化
 initializeFirebase();
 
 /**
- * 認証済みリクエストの型定義
- */
-export interface AuthenticatedRequest extends Request {
-  decodedToken?: admin.auth.DecodedIdToken;
-  user?: User;
-}
-
-/**
  * 認証ミドルウェア
  * Authorizationヘッダーからトークンを抽出し、検証する
- * @param req - リクエストオブジェクト
- * @param _res - レスポンスオブジェクト
- * @param next - 次のミドルウェア関数
  */
-export async function authMiddleware(
-  req: AuthenticatedRequest,
-  _res: Response,
-  next: NextFunction
-): Promise<void> {
-  // 1. Authorizationヘッダーの検証
-  const authHeader = req.headers.authorization;
+export const authMiddleware = createMiddleware<AuthEnv>(async (c, next) => {
+  const authHeader = c.req.header("Authorization");
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    next(new AppError(401, "UNAUTHORIZED", "認証トークンが必要です"));
-    return;
+    throw new HTTPException(401, { message: "認証トークンが必要です" });
   }
 
-  // 2. Firebaseトークンの検証
   const token = authHeader.split("Bearer ")[1];
   let decodedToken: admin.auth.DecodedIdToken;
+
   try {
     decodedToken = await admin.auth().verifyIdToken(token);
   } catch {
-    next(new AppError(401, "UNAUTHORIZED", "無効な認証トークンです"));
-    return;
+    throw new HTTPException(401, { message: "無効な認証トークンです" });
   }
-  req.decodedToken = decodedToken;
 
-  // 3. ユーザー情報の取得
-  try {
-    const user = await findOrCreateUser(decodedToken.uid);
-    req.user = user;
-    next();
-  } catch (error) {
-    if (error instanceof AppError) {
-      next(error);
-      return;
-    }
-    // DB接続エラーなどは内部エラーとして処理
-    next(
-      new AppError(500, "INTERNAL_ERROR", "サーバー内部エラーが発生しました")
-    );
-  }
-}
+  c.set("decodedToken", decodedToken);
+
+  const user = await findOrCreateUser(decodedToken.uid);
+  c.set("user", user);
+
+  await next();
+});
