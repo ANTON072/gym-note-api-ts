@@ -8,29 +8,34 @@ export const presetExerciseSeeds = [
   // 胸
   { name: "ベンチプレス", bodyPart: BodyPart.CHEST },
   { name: "インクラインベンチプレス", bodyPart: BodyPart.CHEST },
+  { name: "ダンベルベンチプレス", bodyPart: BodyPart.CHEST },
+  { name: "ダンベルインクラインベンチプレス", bodyPart: BodyPart.CHEST },
   { name: "ダンベルフライ", bodyPart: BodyPart.CHEST },
-  { name: "ケーブルクロスオーバー", bodyPart: BodyPart.CHEST },
-  { name: "チェストプレス", bodyPart: BodyPart.CHEST },
+  { name: "スミスマシンベンチプレス", bodyPart: BodyPart.CHEST },
+  { name: "スミスマシンインクラインベンチプレス", bodyPart: BodyPart.CHEST },
 
   // 背中
   { name: "デッドリフト", bodyPart: BodyPart.BACK },
   { name: "ラットプルダウン", bodyPart: BodyPart.BACK },
   { name: "ベントオーバーロウ", bodyPart: BodyPart.BACK },
   { name: "シーテッドロウ", bodyPart: BodyPart.BACK },
-  { name: "懸垂", bodyPart: BodyPart.BACK },
+  { name: "チンニング", bodyPart: BodyPart.BACK },
+  { name: "アシストチンニング", bodyPart: BodyPart.BACK },
+  { name: "ワンハンドダンベルロウ", bodyPart: BodyPart.BACK },
 
   // 肩
-  { name: "ショルダープレス", bodyPart: BodyPart.SHOULDERS },
-  { name: "サイドレイズ", bodyPart: BodyPart.SHOULDERS },
-  { name: "フロントレイズ", bodyPart: BodyPart.SHOULDERS },
-  { name: "リアデルトフライ", bodyPart: BodyPart.SHOULDERS },
-  { name: "アーノルドプレス", bodyPart: BodyPart.SHOULDERS },
+  { name: "スタンディングミリタリープレス", bodyPart: BodyPart.SHOULDERS },
+  { name: "シーテッドミリタリープレス", bodyPart: BodyPart.SHOULDERS },
+  { name: "スミスマシンショルダープレス", bodyPart: BodyPart.SHOULDERS },
+  { name: "ダンベルショルダープレス", bodyPart: BodyPart.SHOULDERS },
+  { name: "ダンベルサイドレイズ", bodyPart: BodyPart.SHOULDERS },
+  { name: "ダンベルインクラインサイドレイズ", bodyPart: BodyPart.SHOULDERS },
+  { name: "ダンベルリアレイズ", bodyPart: BodyPart.SHOULDERS },
 
   // 腕
-  { name: "バーベルカール", bodyPart: BodyPart.ARMS },
-  { name: "ダンベルカール", bodyPart: BodyPart.ARMS },
+  { name: "バーベルアームカール", bodyPart: BodyPart.ARMS },
+  { name: "ダンベルアームカール", bodyPart: BodyPart.ARMS },
   { name: "ハンマーカール", bodyPart: BodyPart.ARMS },
-  { name: "トライセプスプッシュダウン", bodyPart: BodyPart.ARMS },
   { name: "スカルクラッシャー", bodyPart: BodyPart.ARMS },
 
   // 脚
@@ -40,10 +45,9 @@ export const presetExerciseSeeds = [
   { name: "レッグカール", bodyPart: BodyPart.LEGS },
   { name: "カーフレイズ", bodyPart: BodyPart.LEGS },
   { name: "ブルガリアンスクワット", bodyPart: BodyPart.LEGS },
+  { name: "ルーマニアンデッドリフト", bodyPart: BodyPart.LEGS },
 
   // 体幹
-  { name: "プランク", bodyPart: BodyPart.CORE },
-  { name: "アブローラー", bodyPart: BodyPart.CORE },
-  { name: "ケーブルクランチ", bodyPart: BodyPart.CORE },
-  { name: "ハンギングレッグレイズ", bodyPart: BodyPart.CORE },
+  { name: "クランチ", bodyPart: BodyPart.CORE },
+  { name: "レッグレイズ", bodyPart: BodyPart.CORE },
 ];
