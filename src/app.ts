@@ -7,7 +7,6 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 
 import health from "./routes/health";
-import user from "./routes/user";
 import exercise from "./routes/exercise";
 import workout from "./routes/workout";
 
@@ -19,7 +18,6 @@ app.use("*", cors());
 
 // ルート
 app.route("/health", health);
-app.route("/api/v1/user", user);
 app.route("/api/v1/exercises", exercise);
 app.route("/api/v1/workouts", workout);
 

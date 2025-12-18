@@ -9,30 +9,6 @@
 
 ---
 
-## User
-
-### GET `/api/v1/user`
-
-現在のユーザー情報を取得します。初回アクセス時は Firebase の情報を元にユーザーを自動登録します。
-
-#### レスポンス
-
-```json
-{
-  "user": {
-    "id": "cuid",
-    "firebaseUid": "firebase_uid",
-    "email": "user@example.com",
-    "name": "ユーザー名",
-    "imageUrl": "https://example.com/image.jpg",
-    "createdAt": "2024-01-15T10:00:00.000Z",
-    "updatedAt": "2024-01-15T10:00:00.000Z"
-  }
-}
-```
-
----
-
 ## Exercise（種目マスタ）
 
 ### GET `/api/v1/exercises`
@@ -134,9 +110,9 @@
 
 #### クエリパラメータ
 
-| パラメータ | 型     | 説明                                    |
-| ---------- | ------ | --------------------------------------- |
-| offset     | number | 取得を開始する位置（デフォルト: 0）     |
+| パラメータ | 型     | 説明                                |
+| ---------- | ------ | ----------------------------------- |
+| offset     | number | 取得を開始する位置（デフォルト: 0） |
 
 #### レスポンス
 
@@ -266,30 +242,28 @@
     {
       "exercise": { "name": "懸垂", "bodyPart": 1, "laterality": 0 },
       "orderIndex": 1,
-      "workoutSets": [
-        { "weight": null, "reps": 10 }
-      ]
+      "workoutSets": [{ "weight": null, "reps": 10 }]
     }
   ]
 }
 ```
 
-| フィールド                              | 型               | 必須 | 説明                                      |
-| --------------------------------------- | ---------------- | ---- | ----------------------------------------- |
-| performedStartAt                        | string (ISO8601) | ○    | 開始日時                                  |
-| performedEndAt                          | string (ISO8601) | -    | 終了日時                                  |
-| place                                   | string           | -    | 場所                                      |
-| note                                    | string           | -    | メモ                                      |
-| workoutExercises                        | array            | -    | 実施した種目一覧                          |
-| workoutExercises[].exercise             | object           | ○    | 種目指定（下記のいずれか）                |
-| workoutExercises[].exercise.id          | string           | -    | 既存種目のID                              |
-| workoutExercises[].exercise.name        | string           | -    | 新規種目の名前                            |
-| workoutExercises[].exercise.bodyPart    | number           | -    | 新規種目の部位                            |
-| workoutExercises[].exercise.laterality  | number           | -    | 新規種目の左右区分                        |
-| workoutExercises[].orderIndex           | number           | ○    | 表示順                                    |
-| workoutExercises[].workoutSets          | array            | -    | セット一覧                                |
-| workoutExercises[].workoutSets[].weight | number           | -    | 重量（kg）                                |
-| workoutExercises[].workoutSets[].reps   | number           | -    | 回数                                      |
+| フィールド                              | 型               | 必須 | 説明                       |
+| --------------------------------------- | ---------------- | ---- | -------------------------- |
+| performedStartAt                        | string (ISO8601) | ○    | 開始日時                   |
+| performedEndAt                          | string (ISO8601) | -    | 終了日時                   |
+| place                                   | string           | -    | 場所                       |
+| note                                    | string           | -    | メモ                       |
+| workoutExercises                        | array            | -    | 実施した種目一覧           |
+| workoutExercises[].exercise             | object           | ○    | 種目指定（下記のいずれか） |
+| workoutExercises[].exercise.id          | string           | -    | 既存種目のID               |
+| workoutExercises[].exercise.name        | string           | -    | 新規種目の名前             |
+| workoutExercises[].exercise.bodyPart    | number           | -    | 新規種目の部位             |
+| workoutExercises[].exercise.laterality  | number           | -    | 新規種目の左右区分         |
+| workoutExercises[].orderIndex           | number           | ○    | 表示順                     |
+| workoutExercises[].workoutSets          | array            | -    | セット一覧                 |
+| workoutExercises[].workoutSets[].weight | number           | -    | 重量（kg）                 |
+| workoutExercises[].workoutSets[].reps   | number           | -    | 回数                       |
 
 #### レスポンス
 
