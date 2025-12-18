@@ -5,7 +5,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/config/database";
-import { TEST_USER_ID, mockExercise } from "@/__tests__/fixtures/exercise";
+import {
+  TEST_USER_ID,
+  mockExercise,
+  mockPresetExercise,
+} from "@/__tests__/fixtures/exercise";
 
 import { updateExercise } from "./update";
 
@@ -138,5 +142,26 @@ describe("updateExercise", () => {
     ).rejects.toMatchObject({
       status: 409,
     });
+  });
+
+  it("プリセット種目は更新できない", async () => {
+    vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockPresetExercise);
+
+    await expect(
+      updateExercise({
+        exerciseId: "preset-exercise1",
+        userId: TEST_USER_ID,
+        exerciseData: {
+          name: "プリセットベンチプレス（編集）",
+          bodyPart: 0,
+          laterality: 0,
+        },
+      })
+    ).rejects.toMatchObject({
+      status: 403,
+      message: "プリセット種目は編集できません",
+    });
+
+    expect(prisma.exercise.update).not.toHaveBeenCalled();
   });
 });

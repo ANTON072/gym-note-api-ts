@@ -4,7 +4,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { prisma } from "@/config/database";
-import { TEST_USER_ID, mockExercise } from "@/__tests__/fixtures/exercise";
+import {
+  TEST_USER_ID,
+  mockExercise,
+  mockPresetExercise,
+} from "@/__tests__/fixtures/exercise";
 
 import { deleteExercise } from "./delete";
 
@@ -89,5 +93,21 @@ describe("deleteExercise", () => {
     ).rejects.toMatchObject({
       status: 404,
     });
+  });
+
+  it("プリセット種目は削除できない", async () => {
+    vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockPresetExercise);
+
+    await expect(
+      deleteExercise({
+        exerciseId: "preset-exercise1",
+        userId: TEST_USER_ID,
+      })
+    ).rejects.toMatchObject({
+      status: 403,
+      message: "プリセット種目は削除できません",
+    });
+
+    expect(prisma.exercise.update).not.toHaveBeenCalled();
   });
 });

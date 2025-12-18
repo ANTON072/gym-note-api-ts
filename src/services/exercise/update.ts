@@ -1,13 +1,19 @@
 /**
  * エクササイズ更新サービス
+ * プリセット種目は編集不可
  */
 import { prisma } from "@/config/database";
 import type { Exercise, ExerciseRequest } from "@/validators/exercise";
 
-import { findExerciseForUser, handleUniqueConstraintError } from "./types";
+import {
+  assertNotPreset,
+  findExerciseForUser,
+  handleUniqueConstraintError,
+} from "./types";
 
 /**
  * Exerciseを更新する
+ * プリセット種目の場合は403エラーをスローする
  */
 export async function updateExercise({
   exerciseId,
@@ -18,7 +24,8 @@ export async function updateExercise({
   userId: string;
   exerciseData: ExerciseRequest;
 }): Promise<Exercise> {
-  await findExerciseForUser(exerciseId, userId);
+  const exercise = await findExerciseForUser(exerciseId, userId);
+  assertNotPreset(exercise, "edit");
 
   try {
     return await prisma.exercise.update({

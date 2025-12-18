@@ -12,23 +12,25 @@
 | ----------------- | ---------------------------------------------------- |
 | users             | アプリのユーザー情報（Firebase Auth 連携）           |
 | workouts          | トレーニング日の記録（いつ、どのくらいの時間）       |
-| exercises         | ユーザー別種目マスタ（ベンチプレス、スクワットなど） |
+| exercises         | 種目マスタ（プリセット種目 + ユーザーカスタム種目）  |
 | workout_exercises | トレーニング日に行った種目（中間テーブル）           |
 | workout_sets      | 各種目で行ったセットごとの重量・回数                 |
 
 ### データ構造のイメージ
 
 ```
+Exercise（種目マスタ）
+├── [プリセット] ベンチプレス, スクワット, デッドリフト ...（全ユーザー共通）
+└── [カスタム] 田中さん専用のオリジナル種目
+
 User: 田中さん
-├── Exercise: ベンチプレス, スクワット, デッドリフト
-│
 └── Workout: 2024/1/15 10:00-11:30
-      ├── WorkoutExercise: ベンチプレス (order: 1)
+      ├── WorkoutExercise: ベンチプレス (order: 1)  ← プリセット種目を使用
       │     ├── Set1: 60kg × 10回
       │     ├── Set2: 70kg × 8回
       │     └── Set3: 80kg × 5回
       │
-      └── WorkoutExercise: スクワット (order: 2)
+      └── WorkoutExercise: スクワット (order: 2)    ← プリセット種目を使用
             ├── Set1: 80kg × 10回
             └── Set2: 100kg × 6回
 ```
@@ -53,7 +55,7 @@ User: 田中さん
 ```mermaid
 erDiagram
     users ||--o{ workouts : "1:N"
-    users ||--o{ exercises : "1:N"
+    users |o--o{ exercises : "0..1:N"
     workouts ||--o{ workout_exercises : "1:N"
     exercises ||--o{ workout_exercises : "1:N"
     workout_exercises ||--o{ workout_sets : "1:N"
@@ -79,6 +81,7 @@ erDiagram
     exercises {
         cuid id PK
         cuid user_id FK
+        boolean is_preset
         varchar name
         int body_part
         int laterality
@@ -132,20 +135,34 @@ erDiagram
 
 ---
 
-## exercises（ユーザー別種目マスタ）
+## exercises（種目マスタ）
 
-ユーザーごとに独自の種目を管理するマスタテーブル。
+種目を管理するマスタテーブル。プリセット種目（システム共通）とカスタム種目（ユーザー別）の両方を格納する。
 
-| カラム名   | 型           | 制約        | 説明                         |
-| ---------- | ------------ | ----------- | ---------------------------- |
-| id         | CUID         | PK          | 主キー（自動生成）           |
-| user_id    | CUID         | FK NOT NULL | ユーザーID                   |
-| name       | VARCHAR(255) | NOT NULL    | 種目名                       |
-| body_part  | INTEGER      |             | 部位（enum: 胸、背中など）   |
-| laterality | INTEGER      |             | 左右区分（enum: 両側、片側） |
-| deleted_at | DATETIME     |             | 論理削除日時                 |
-| created_at | DATETIME     | NOT NULL    | 作成日時                     |
-| updated_at | DATETIME     | NOT NULL    | 更新日時                     |
+| カラム名   | 型           | 制約     | 説明                                   |
+| ---------- | ------------ | -------- | -------------------------------------- |
+| id         | CUID         | PK       | 主キー（自動生成）                     |
+| user_id    | CUID         | FK       | ユーザーID（プリセットの場合は NULL）  |
+| is_preset  | BOOLEAN      | NOT NULL | プリセット種目フラグ（デフォルト: false） |
+| name       | VARCHAR(255) | NOT NULL | 種目名                                 |
+| body_part  | INTEGER      |          | 部位（enum: 胸、背中など）             |
+| laterality | INTEGER      |          | 左右区分（enum: 両側、片側）           |
+| deleted_at | DATETIME     |          | 論理削除日時                           |
+| created_at | DATETIME     | NOT NULL | 作成日時                               |
+| updated_at | DATETIME     | NOT NULL | 更新日時                               |
+
+### プリセット種目とカスタム種目
+
+| 種別           | is_preset | user_id | 編集 | 削除 | 説明                           |
+| -------------- | --------- | ------- | ---- | ---- | ------------------------------ |
+| プリセット種目 | true      | NULL    | 不可 | 不可 | システム提供の定番種目         |
+| カスタム種目   | false     | ユーザーID | 可   | 可   | ユーザーが独自に追加した種目   |
+
+### 複合ユニーク制約
+
+- (user_id, name) - ユーザーごとに種目名がユニーク（カスタム種目のみ）
+
+※ プリセット種目（user_id = NULL）は name のユニーク制約を別途設定
 
 ### Enum 定義
 

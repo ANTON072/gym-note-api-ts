@@ -8,6 +8,7 @@ import {
   TEST_USER_ID,
   mockExercise,
   mockExerciseList,
+  mockPresetExercise,
 } from "@/__tests__/fixtures/exercise";
 
 import { fetchExercises, fetchExerciseById } from "./fetch";
@@ -27,13 +28,17 @@ describe("fetchExercises", () => {
     vi.clearAllMocks();
   });
 
-  it("指定したユーザーのエクササイズ一覧を返す", async () => {
+  it("プリセット種目とユーザーのカスタム種目の両方を返す", async () => {
     vi.mocked(prisma.exercise.findMany).mockResolvedValue(mockExerciseList);
 
     const result = await fetchExercises(TEST_USER_ID);
 
     expect(prisma.exercise.findMany).toHaveBeenCalledWith({
-      where: { userId: TEST_USER_ID, deletedAt: null },
+      where: {
+        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
+        deletedAt: null,
+      },
+      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
     });
     expect(result).toEqual(mockExerciseList);
     expect(result).toHaveLength(2);
@@ -55,10 +60,11 @@ describe("fetchExercises", () => {
 
     expect(prisma.exercise.findMany).toHaveBeenCalledWith({
       where: {
-        userId: TEST_USER_ID,
+        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
         deletedAt: null,
         name: { startsWith: "ベン" },
       },
+      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
     });
     expect(result).toEqual([mockExercise]);
   });
@@ -70,10 +76,11 @@ describe("fetchExercises", () => {
 
     expect(prisma.exercise.findMany).toHaveBeenCalledWith({
       where: {
-        userId: TEST_USER_ID,
+        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
         deletedAt: null,
         bodyPart: 1,
       },
+      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
     });
     expect(result).toEqual([mockExercise]);
   });
@@ -88,11 +95,12 @@ describe("fetchExercises", () => {
 
     expect(prisma.exercise.findMany).toHaveBeenCalledWith({
       where: {
-        userId: TEST_USER_ID,
+        OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
         deletedAt: null,
         name: { startsWith: "ベン" },
         bodyPart: 1,
       },
+      orderBy: [{ isPreset: "desc" }, { name: "asc" }],
     });
     expect(result).toEqual([mockExercise]);
   });
@@ -103,7 +111,7 @@ describe("fetchExerciseById", () => {
     vi.clearAllMocks();
   });
 
-  it("指定したIDのエクササイズを返す", async () => {
+  it("指定したIDのカスタム種目を返す", async () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
 
     const result = await fetchExerciseById({
@@ -115,6 +123,18 @@ describe("fetchExerciseById", () => {
       where: { id: "exercise1" },
     });
     expect(result).toEqual(mockExercise);
+  });
+
+  it("プリセット種目は全ユーザーがアクセスできる", async () => {
+    vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockPresetExercise);
+
+    const result = await fetchExerciseById({
+      exerciseId: "preset-exercise1",
+      userId: TEST_USER_ID,
+    });
+
+    expect(result).toEqual(mockPresetExercise);
+    expect(result.isPreset).toBe(true);
   });
 
   it("存在しないエクササイズの場合、NOT_FOUNDエラーをスローする", async () => {
@@ -130,7 +150,7 @@ describe("fetchExerciseById", () => {
     });
   });
 
-  it("他のユーザーのエクササイズは取得できない", async () => {
+  it("他のユーザーのカスタム種目は取得できない", async () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue({
       ...mockExercise,
       userId: "other-user",

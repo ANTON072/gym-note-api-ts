@@ -1,9 +1,10 @@
 /**
- * エクササイズのシードデータ
+ * プリセット種目のシードデータ
+ * 全ユーザー共通で使用できる定番種目
  */
 import { BodyPart, Laterality } from "../../src/types/exercise";
 
-export const exerciseSeeds = [
+export const presetExerciseSeeds = [
   // 胸
   { name: "ベンチプレス", bodyPart: BodyPart.CHEST, laterality: Laterality.BILATERAL },
   { name: "インクラインベンチプレス", bodyPart: BodyPart.CHEST, laterality: Laterality.BILATERAL },
