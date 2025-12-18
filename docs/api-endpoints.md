@@ -226,9 +226,9 @@
         "exerciseType": 0,
         "isPreset": true
       },
-      "workoutSets": [
-        { "id": "cuid", "weight": 60, "reps": 10 },
-        { "id": "cuid", "weight": 70, "reps": 8 }
+      "sets": [
+        { "id": "cuid", "weight": 60000, "reps": 10, "distance": null, "duration": null, "speed": null, "calories": null },
+        { "id": "cuid", "weight": 70000, "reps": 8, "distance": null, "duration": null, "speed": null, "calories": null }
       ]
     }
   ]
@@ -243,17 +243,13 @@
 
 ```json
 {
-  "performedStartAt": "2024-01-15T10:00:00.000Z",
-  "performedEndAt": "2024-01-15T11:30:00.000Z",
-  "place": "ジム"
+  "performedStartAt": "2024-01-15T10:00:00.000Z"
 }
 ```
 
 | フィールド       | 型               | 必須 | 説明     |
 | ---------------- | ---------------- | ---- | -------- |
 | performedStartAt | string (ISO8601) | ○    | 開始日時 |
-| performedEndAt   | string (ISO8601) | -    | 終了日時 |
-| place            | string           | -    | 場所     |
 
 #### レスポンス
 
@@ -261,8 +257,8 @@
 {
   "id": "cuid",
   "performedStartAt": "2024-01-15T10:00:00.000Z",
-  "performedEndAt": "2024-01-15T11:30:00.000Z",
-  "place": "ジム",
+  "performedEndAt": null,
+  "place": null,
   "createdAt": "2024-01-15T12:00:00.000Z",
   "updatedAt": "2024-01-15T12:00:00.000Z",
   "workouts": []
@@ -305,9 +301,9 @@
         "exerciseType": 0,
         "isPreset": true
       },
-      "workoutSets": [
-        { "id": "cuid", "weight": 60, "reps": 10 },
-        { "id": "cuid", "weight": 70, "reps": 8 }
+      "sets": [
+        { "id": "cuid", "weight": 60000, "reps": 10, "distance": null, "duration": null, "speed": null, "calories": null },
+        { "id": "cuid", "weight": 70000, "reps": 8, "distance": null, "duration": null, "speed": null, "calories": null }
       ]
     }
   ]
@@ -358,7 +354,7 @@
     "exerciseType": 0,
     "isPreset": true
   },
-  "workoutSets": []
+  "sets": []
 }
 ```
 
@@ -491,51 +487,7 @@
 
 ```json
 {
-  "workouts": [
-    {
-      "id": "workout-id-1",
-      "orderIndex": 1,
-      "note": null,
-      "exercise": {
-        "id": "cuid",
-        "name": "スクワット",
-        "bodyPart": 4,
-        "exerciseType": 0,
-        "isPreset": true
-      },
-      "sets": [
-        { "id": "cuid", "weight": 80000, "reps": 10, "distance": null, "duration": null, "speed": null, "calories": null }
-      ]
-    },
-    {
-      "id": "workout-id-2",
-      "orderIndex": 2,
-      "note": null,
-      "exercise": {
-        "id": "cuid",
-        "name": "ベンチプレス",
-        "bodyPart": 0,
-        "exerciseType": 0,
-        "isPreset": true
-      },
-      "sets": [
-        { "id": "cuid", "weight": 60000, "reps": 10, "distance": null, "duration": null, "speed": null, "calories": null }
-      ]
-    },
-    {
-      "id": "workout-id-3",
-      "orderIndex": 3,
-      "note": null,
-      "exercise": {
-        "id": "cuid",
-        "name": "デッドリフト",
-        "bodyPart": 1,
-        "exerciseType": 0,
-        "isPreset": true
-      },
-      "sets": []
-    }
-  ]
+  "message": "並び替えが完了しました"
 }
 ```
 

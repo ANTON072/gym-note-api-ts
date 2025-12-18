@@ -36,9 +36,9 @@ gym-note-api-ts/
 │   │   └── auth.ts          # Firebase認証ミドルウェア
 │   ├── routes/              # ルート定義（ハンドラー統合）
 │   │   ├── health.ts
-│   │   ├── user.ts
 │   │   ├── exercise.ts
-│   │   └── workout.ts
+│   │   ├── training-session.ts  # トレーニングセッション + ワークアウト追加/削除/並び替え
+│   │   └── workout.ts           # ワークアウト更新（メモ + セット差分更新）
 │   ├── services/            # ビジネスロジック
 │   │   ├── user.ts          # 単一ファイル形式
 │   │   ├── exercise/        # ディレクトリ形式
@@ -48,13 +48,20 @@ gym-note-api-ts/
 │   │   │   ├── fetch.ts     # 取得処理
 │   │   │   ├── update.ts    # 更新処理
 │   │   │   └── delete.ts    # 削除処理
+│   │   ├── training-session/ # ディレクトリ形式
+│   │   │   ├── index.ts
+│   │   │   ├── types.ts
+│   │   │   ├── create.ts
+│   │   │   ├── fetch.ts
+│   │   │   ├── update.ts
+│   │   │   └── delete.ts
 │   │   └── workout/         # ディレクトリ形式
 │   │       ├── index.ts
 │   │       ├── types.ts
-│   │       ├── create.ts
-│   │       ├── fetch.ts
-│   │       ├── update.ts
-│   │       └── delete.ts
+│   │       ├── add.ts       # ワークアウト追加
+│   │       ├── update.ts    # メモ + セット差分更新
+│   │       ├── delete.ts    # ワークアウト削除
+│   │       └── reorder.ts   # 並び替え
 │   ├── types/               # 型定義
 │   │   ├── exercise.ts
 │   │   └── hono.ts          # Hono用型定義（AuthEnv）
