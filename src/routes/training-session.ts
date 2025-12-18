@@ -334,19 +334,26 @@ trainingSessionRoutes.openapi(updateSessionRoute, async (c) => {
   const { sessionId } = c.req.valid("param");
   const data = c.req.valid("json");
 
+  // 日付フィールドの変換
+  const performedStartAt = data.performedStartAt
+    ? new Date(data.performedStartAt)
+    : undefined;
+
+  let performedEndAt: Date | null | undefined;
+  if (data.performedEndAt === undefined) {
+    performedEndAt = undefined;
+  } else if (data.performedEndAt === null) {
+    performedEndAt = null;
+  } else {
+    performedEndAt = new Date(data.performedEndAt);
+  }
+
   const session = await updateTrainingSession({
     sessionId,
     userId: user.id,
     data: {
-      performedStartAt: data.performedStartAt
-        ? new Date(data.performedStartAt)
-        : undefined,
-      performedEndAt:
-        data.performedEndAt !== undefined
-          ? data.performedEndAt
-            ? new Date(data.performedEndAt)
-            : null
-          : undefined,
+      performedStartAt,
+      performedEndAt,
       place: data.place,
     },
   });

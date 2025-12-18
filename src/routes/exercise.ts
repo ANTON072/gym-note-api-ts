@@ -24,6 +24,28 @@ import {
   messageResponseSchema,
 } from "@/schemas/common";
 
+/**
+ * Exercise を API レスポンス形式に変換
+ * Date を ISO 文字列に変換する
+ */
+const serializeExercise = (exercise: {
+  id: string;
+  name: string;
+  bodyPart: number | null;
+  exerciseType: number;
+  isPreset: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}) => ({
+  id: exercise.id,
+  name: exercise.name,
+  bodyPart: exercise.bodyPart,
+  exerciseType: exercise.exerciseType,
+  isPreset: exercise.isPreset,
+  createdAt: exercise.createdAt.toISOString(),
+  updatedAt: exercise.updatedAt.toISOString(),
+});
+
 const exercise = new OpenAPIHono<AuthEnv>();
 
 // 全ルートに認証を適用
@@ -63,7 +85,7 @@ const listExercisesRoute = createRoute({
 exercise.openapi(listExercisesRoute, async (c) => {
   const user = c.get("user");
   const exercises = await fetchExercises(user.id);
-  return c.json({ exercises }, 200);
+  return c.json({ exercises: exercises.map(serializeExercise) }, 200);
 });
 
 /**
@@ -113,7 +135,7 @@ exercise.openapi(getExerciseRoute, async (c) => {
   const { exerciseId } = c.req.valid("param");
 
   const result = await fetchExerciseById({ exerciseId, userId: user.id });
-  return c.json({ exercise: result }, 200);
+  return c.json({ exercise: serializeExercise(result) }, 200);
 });
 
 /**
@@ -177,7 +199,7 @@ exercise.openapi(createExerciseRoute, async (c) => {
   const exerciseData = c.req.valid("json");
 
   const result = await createExercise({ userId: user.id, exerciseData });
-  return c.json({ exercise: result }, 201);
+  return c.json({ exercise: serializeExercise(result) }, 201);
 });
 
 /**
@@ -255,7 +277,7 @@ exercise.openapi(updateExerciseRoute, async (c) => {
     userId: user.id,
     exerciseData,
   });
-  return c.json({ exercise: result }, 200);
+  return c.json({ exercise: serializeExercise(result) }, 200);
 });
 
 /**

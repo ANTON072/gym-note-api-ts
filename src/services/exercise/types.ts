@@ -5,7 +5,7 @@ import { Prisma } from "@prisma/client";
 import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
-import type { Exercise } from "@/schemas/exercise";
+import type { ExerciseInternal } from "@/schemas/exercise";
 
 /**
  * Prismaのユニーク制約エラー（P2002）をHTTPExceptionに変換する
@@ -29,7 +29,7 @@ export function handleUniqueConstraintError(error: unknown): never {
 export async function findExerciseForUser(
   exerciseId: string,
   userId: string
-): Promise<Exercise & { deletedAt: Date | null; isPreset: boolean }> {
+): Promise<ExerciseInternal & { deletedAt: Date | null }> {
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
   });

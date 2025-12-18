@@ -2,7 +2,7 @@
  * エクササイズ作成サービス
  */
 import { prisma } from "@/config/database";
-import type { Exercise, ExerciseRequest } from "@/schemas/exercise";
+import type { ExerciseInternal, ExerciseRequest } from "@/schemas/exercise";
 
 import { handleUniqueConstraintError } from "./types";
 
@@ -16,7 +16,7 @@ export async function createExercise({
 }: {
   userId: string;
   exerciseData: ExerciseRequest;
-}): Promise<Exercise> {
+}): Promise<ExerciseInternal> {
   try {
     const exercise = await prisma.exercise.create({
       data: {

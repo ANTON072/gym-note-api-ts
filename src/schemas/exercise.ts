@@ -79,5 +79,12 @@ export const exerciseIdParamSchema = z.object({
 });
 
 // 型エクスポート
+/** API レスポンス用の型（日付は ISO 文字列） */
 export type Exercise = z.infer<typeof exerciseSchema>;
 export type ExerciseRequest = z.infer<typeof exerciseRequestSchema>;
+
+/** サービス層で使用する内部型（日付は Date オブジェクト） */
+export type ExerciseInternal = Omit<Exercise, "createdAt" | "updatedAt"> & {
+  createdAt: Date;
+  updatedAt: Date;
+};

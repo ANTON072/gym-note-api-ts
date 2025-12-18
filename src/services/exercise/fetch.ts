@@ -3,12 +3,12 @@
  * プリセット種目とユーザーのカスタム種目を取得する
  */
 import { prisma } from "@/config/database";
-import type { Exercise } from "@/schemas/exercise";
+import type { ExerciseInternal } from "@/schemas/exercise";
 
 import { findExerciseForUser } from "./types";
 
-/** isPreset を含む Exercise 型 */
-export type ExerciseWithPreset = Exercise & { isPreset: boolean };
+/** isPreset を含む Exercise 型（サービス層用） */
+export type ExerciseWithPreset = ExerciseInternal;
 
 /**
  * Exercise一覧データを返す
