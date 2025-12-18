@@ -28,7 +28,8 @@ workout.use("*", authMiddleware);
 workout.get("/", async (c) => {
   const user = c.get("user");
   const offsetParam = c.req.query("offset");
-  const offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+  const parsedOffset = Number(offsetParam);
+  const offset = Number.isNaN(parsedOffset) ? 0 : parsedOffset;
 
   const result = await fetchWorkouts({ userId: user.id, offset });
   return c.json(result);
