@@ -24,7 +24,7 @@ export async function deleteWorkout({
     where: { id: sessionId },
   });
 
-  if (!session || session.userId !== userId || session.deletedAt !== null) {
+  if (!session || session.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });

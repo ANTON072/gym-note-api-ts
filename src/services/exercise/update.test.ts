@@ -105,26 +105,6 @@ describe("updateExercise", () => {
     });
   });
 
-  it("削除済みのエクササイズは更新できない", async () => {
-    vi.mocked(prisma.exercise.findUnique).mockResolvedValue({
-      ...mockExercise,
-      deletedAt: new Date(),
-    });
-
-    await expect(
-      updateExercise({
-        exerciseId: "exercise1",
-        userId: TEST_USER_ID,
-        exerciseData: {
-          name: "ベンチプレス",
-          bodyPart: 1,
-        },
-      })
-    ).rejects.toMatchObject({
-      status: 404,
-    });
-  });
-
   it("同じ名前のエクササイズが存在する場合、CONFLICTエラーをスローする", async () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
     const prismaError = new Prisma.PrismaClientKnownRequestError(

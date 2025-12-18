@@ -17,7 +17,7 @@ vi.mock("@/config/database", () => ({
   prisma: {
     exercise: {
       findUnique: vi.fn(),
-      update: vi.fn(),
+      delete: vi.fn(),
     },
   },
 }));
@@ -27,12 +27,9 @@ describe("deleteExercise", () => {
     vi.clearAllMocks();
   });
 
-  it("エクササイズを論理削除する", async () => {
+  it("エクササイズを物理削除する", async () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockExercise);
-    vi.mocked(prisma.exercise.update).mockResolvedValue({
-      ...mockExercise,
-      deletedAt: new Date(),
-    });
+    vi.mocked(prisma.exercise.delete).mockResolvedValue(mockExercise);
 
     await deleteExercise({
       exerciseId: "exercise1",
@@ -42,11 +39,8 @@ describe("deleteExercise", () => {
     expect(prisma.exercise.findUnique).toHaveBeenCalledWith({
       where: { id: "exercise1" },
     });
-    expect(prisma.exercise.update).toHaveBeenCalledWith({
+    expect(prisma.exercise.delete).toHaveBeenCalledWith({
       where: { id: "exercise1" },
-      data: {
-        deletedAt: expect.any(Date),
-      },
     });
   });
 
@@ -79,22 +73,6 @@ describe("deleteExercise", () => {
     });
   });
 
-  it("削除済みのエクササイズは削除できない", async () => {
-    vi.mocked(prisma.exercise.findUnique).mockResolvedValue({
-      ...mockExercise,
-      deletedAt: new Date(),
-    });
-
-    await expect(
-      deleteExercise({
-        exerciseId: "exercise1",
-        userId: TEST_USER_ID,
-      })
-    ).rejects.toMatchObject({
-      status: 404,
-    });
-  });
-
   it("プリセット種目は削除できない", async () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue(mockPresetExercise);
 
@@ -108,6 +86,6 @@ describe("deleteExercise", () => {
       message: "プリセット種目は削除できません",
     });
 
-    expect(prisma.exercise.update).not.toHaveBeenCalled();
+    expect(prisma.exercise.delete).not.toHaveBeenCalled();
   });
 });

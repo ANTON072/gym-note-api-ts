@@ -77,7 +77,6 @@ erDiagram
         datetime performed_start_at
         datetime performed_end_at
         varchar place
-        datetime deleted_at
     }
 
     exercises {
@@ -87,7 +86,6 @@ erDiagram
         varchar name
         int body_part
         int exercise_type
-        datetime deleted_at
     }
 
     workouts {
@@ -137,7 +135,6 @@ erDiagram
 | performed_start_at | DATETIME     | NOT NULL    | トレーニング開始時刻 |
 | performed_end_at   | DATETIME     |             | トレーニング終了時刻 |
 | place              | VARCHAR(255) |             | 場所                 |
-| deleted_at         | DATETIME     |             | 論理削除日時         |
 | created_at         | DATETIME     | NOT NULL    | 作成日時             |
 | updated_at         | DATETIME     | NOT NULL    | 更新日時             |
 
@@ -155,7 +152,6 @@ erDiagram
 | name          | VARCHAR(255) | NOT NULL | 種目名                                       |
 | body_part     | INTEGER      |          | 部位（enum: 胸、背中など）                   |
 | exercise_type | INTEGER      | NOT NULL | 種目タイプ（0: 筋トレ, 1: 有酸素）デフォルト: 0 |
-| deleted_at    | DATETIME     |          | 論理削除日時                                 |
 | created_at    | DATETIME     | NOT NULL | 作成日時                                     |
 | updated_at    | DATETIME     | NOT NULL | 更新日時                                     |
 

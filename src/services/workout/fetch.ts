@@ -30,10 +30,7 @@ export async function fetchWorkoutById({
   }
 
   // トレーニングセッションのオーナーを確認
-  if (
-    workout.trainingSession.userId !== userId ||
-    workout.trainingSession.deletedAt !== null
-  ) {
+  if (workout.trainingSession.userId !== userId) {
     throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 

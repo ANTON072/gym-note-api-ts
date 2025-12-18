@@ -34,7 +34,6 @@ model TrainingSession {
   performedStartAt DateTime  @map("performed_start_at")
   performedEndAt   DateTime? @map("performed_end_at")
   place            String?
-  deletedAt        DateTime? @map("deleted_at")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
@@ -68,15 +67,14 @@ model Workout {
 
 // 種目マスタ（プリセット＋カスタム）
 model Exercise {
-  id           String    @id @default(cuid())
-  userId       String?   @map("user_id") // プリセット種目の場合は NULL
-  isPreset     Boolean   @default(false) @map("is_preset")
+  id           String   @id @default(cuid())
+  userId       String?  @map("user_id") // プリセット種目の場合は NULL
+  isPreset     Boolean  @default(false) @map("is_preset")
   name         String
-  bodyPart     Int?      @map("body_part")
-  exerciseType Int       @default(0) @map("exercise_type") // 0: 筋トレ, 1: 有酸素
-  deletedAt    DateTime? @map("deleted_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  bodyPart     Int?     @map("body_part")
+  exerciseType Int      @default(0) @map("exercise_type") // 0: 筋トレ, 1: 有酸素
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user     User?     @relation(fields: [userId], references: [id])
   workouts Workout[]

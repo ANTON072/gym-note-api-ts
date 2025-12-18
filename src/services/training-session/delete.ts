@@ -6,7 +6,8 @@ import { HTTPException } from "hono/http-exception";
 import { prisma } from "@/config/database";
 
 /**
- * トレーニングセッションを削除する（論理削除）
+ * トレーニングセッションを削除する（物理削除）
+ * 関連するワークアウト・セットはカスケード削除される
  */
 export async function deleteTrainingSession({
   sessionId,
@@ -20,14 +21,13 @@ export async function deleteTrainingSession({
     where: { id: sessionId },
   });
 
-  if (!existing || existing.userId !== userId || existing.deletedAt !== null) {
+  if (!existing || existing.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });
   }
 
-  await prisma.trainingSession.update({
+  await prisma.trainingSession.delete({
     where: { id: sessionId },
-    data: { deletedAt: new Date() },
   });
 }
