@@ -32,12 +32,7 @@ export const workoutSetSchema = z
       .min(0)
       .nullable()
       .openapi({ description: "重量（グラム）" }),
-    reps: z
-      .number()
-      .int()
-      .min(0)
-      .nullable()
-      .openapi({ description: "回数" }),
+    reps: z.number().int().min(0).nullable().openapi({ description: "回数" }),
     distance: z
       .number()
       .int()

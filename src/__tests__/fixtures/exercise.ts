@@ -14,7 +14,6 @@ export const mockExercise = {
   name: "ベンチプレス",
   bodyPart: 1,
   exerciseType: ExerciseType.STRENGTH,
-  deletedAt: null,
   createdAt: new Date("2024-01-01T00:00:00Z"),
   updatedAt: new Date("2024-01-01T00:00:00Z"),
 };
@@ -27,7 +26,6 @@ export const mockPresetExercise = {
   name: "プリセットベンチプレス",
   bodyPart: 0,
   exerciseType: ExerciseType.STRENGTH,
-  deletedAt: null,
   createdAt: new Date("2024-01-01T00:00:00Z"),
   updatedAt: new Date("2024-01-01T00:00:00Z"),
 };
@@ -40,7 +38,6 @@ export const mockCardioExercise = {
   name: "ランニング",
   bodyPart: null,
   exerciseType: ExerciseType.CARDIO,
-  deletedAt: null,
   createdAt: new Date("2024-01-01T00:00:00Z"),
   updatedAt: new Date("2024-01-01T00:00:00Z"),
 };
@@ -55,7 +52,6 @@ export const mockExerciseList = [
     name: "スクワット",
     bodyPart: 3,
     exerciseType: ExerciseType.STRENGTH,
-    deletedAt: null,
     createdAt: new Date("2024-01-01T00:00:00Z"),
     updatedAt: new Date("2024-01-01T00:00:00Z"),
   },

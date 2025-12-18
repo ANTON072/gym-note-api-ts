@@ -36,7 +36,6 @@ describe("fetchExercises", () => {
     expect(prisma.exercise.findMany).toHaveBeenCalledWith({
       where: {
         OR: [{ isPreset: true }, { userId: TEST_USER_ID }],
-        deletedAt: null,
       },
       orderBy: [{ isPreset: "desc" }, { name: "asc" }],
     });
@@ -102,22 +101,6 @@ describe("fetchExerciseById", () => {
     vi.mocked(prisma.exercise.findUnique).mockResolvedValue({
       ...mockExercise,
       userId: "other-user",
-    });
-
-    await expect(
-      fetchExerciseById({
-        exerciseId: "exercise1",
-        userId: TEST_USER_ID,
-      })
-    ).rejects.toMatchObject({
-      status: 404,
-    });
-  });
-
-  it("削除済みのエクササイズは取得できない", async () => {
-    vi.mocked(prisma.exercise.findUnique).mockResolvedValue({
-      ...mockExercise,
-      deletedAt: new Date(),
     });
 
     await expect(

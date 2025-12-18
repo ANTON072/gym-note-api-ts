@@ -11,7 +11,6 @@ export const mockExercise = {
   userId: TEST_USER_ID,
   name: "ベンチプレス",
   bodyPart: 1,
-  deletedAt: null,
   createdAt: new Date("2024-01-01T00:00:00Z"),
   updatedAt: new Date("2024-01-01T00:00:00Z"),
 };
@@ -24,7 +23,6 @@ export const mockWorkoutWithRelations = {
   performedEndAt: new Date("2024-01-15T11:30:00Z"),
   place: "ジム",
   note: "調子良かった",
-  deletedAt: null,
   createdAt: new Date("2024-01-15T12:00:00Z"),
   updatedAt: new Date("2024-01-15T12:00:00Z"),
   workoutExercises: [
@@ -54,7 +52,6 @@ export const mockWorkoutList = [
     performedEndAt: null,
     place: "自宅",
     note: null,
-    deletedAt: null,
     createdAt: new Date("2024-01-14T10:00:00Z"),
     updatedAt: new Date("2024-01-14T10:00:00Z"),
     workoutExercises: [],

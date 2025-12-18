@@ -25,7 +25,7 @@ export async function reorderWorkouts({
     include: { workouts: true },
   });
 
-  if (!session || session.userId !== userId || session.deletedAt !== null) {
+  if (!session || session.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });

@@ -29,12 +29,12 @@ export function handleUniqueConstraintError(error: unknown): never {
 export async function findExerciseForUser(
   exerciseId: string,
   userId: string
-): Promise<ExerciseInternal & { deletedAt: Date | null }> {
+): Promise<ExerciseInternal> {
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
   });
 
-  if (!exercise || exercise.deletedAt !== null) {
+  if (!exercise) {
     throw new HTTPException(404, { message: "エクササイズが見つかりません" });
   }
 

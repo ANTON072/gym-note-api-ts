@@ -42,10 +42,7 @@ export async function updateWorkout({
   }
 
   // トレーニングセッションのオーナーを確認
-  if (
-    existingWorkout.trainingSession.userId !== userId ||
-    existingWorkout.trainingSession.deletedAt !== null
-  ) {
+  if (existingWorkout.trainingSession.userId !== userId) {
     throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 

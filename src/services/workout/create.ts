@@ -26,7 +26,7 @@ export async function addWorkout({
     where: { id: sessionId },
   });
 
-  if (!session || session.userId !== userId || session.deletedAt !== null) {
+  if (!session || session.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });
@@ -37,7 +37,7 @@ export async function addWorkout({
     where: { id: exerciseId },
   });
 
-  if (!exercise || exercise.deletedAt !== null) {
+  if (!exercise) {
     throw new HTTPException(404, { message: "種目が見つかりません" });
   }
 

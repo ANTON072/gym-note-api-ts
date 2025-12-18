@@ -267,7 +267,7 @@ z.string().url();
 ## ドキュメント
 
 - [DB テーブル設計](docs/db-table-structure.md)
-- [API エンドポイント一覧](docs/api-endpoints.md)
+- [OpenAPI 仕様](docs/openapi.yaml)
 
 ## 参考リンク
 

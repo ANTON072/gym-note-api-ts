@@ -24,7 +24,6 @@ export async function fetchExercises(
         { isPreset: true }, // プリセット種目
         { userId }, // ユーザーのカスタム種目
       ],
-      deletedAt: null,
     },
     orderBy: [{ isPreset: "desc" }, { name: "asc" }], // プリセット種目を先に表示
   });

@@ -31,7 +31,7 @@ export async function updateTrainingSession({
     where: { id: sessionId },
   });
 
-  if (!existing || existing.userId !== userId || existing.deletedAt !== null) {
+  if (!existing || existing.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });

@@ -26,10 +26,7 @@ import {
   sessionAndWorkoutIdParamSchema,
   trainingSessionQuerySchema,
 } from "@/schemas/training-session";
-import {
-  errorResponseSchema,
-  messageResponseSchema,
-} from "@/schemas/common";
+import { errorResponseSchema, messageResponseSchema } from "@/schemas/common";
 
 const trainingSessionRoutes = new OpenAPIHono<AuthEnv>();
 

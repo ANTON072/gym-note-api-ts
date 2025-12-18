@@ -23,7 +23,7 @@ export async function fetchTrainingSessions({
   userId: string;
   offset?: number;
 }): Promise<FetchTrainingSessionsResult> {
-  const where = { userId, deletedAt: null };
+  const where = { userId };
 
   const [trainingSessions, total] = await Promise.all([
     prisma.trainingSession.findMany({
@@ -61,7 +61,7 @@ export async function fetchTrainingSessionById({
     include: trainingSessionWithRelations,
   });
 
-  if (!session || session.userId !== userId || session.deletedAt !== null) {
+  if (!session || session.userId !== userId) {
     throw new HTTPException(404, {
       message: "トレーニングセッションが見つかりません",
     });

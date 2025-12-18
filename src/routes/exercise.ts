@@ -19,10 +19,7 @@ import {
   exerciseRequestSchema,
   exerciseIdParamSchema,
 } from "@/schemas/exercise";
-import {
-  errorResponseSchema,
-  messageResponseSchema,
-} from "@/schemas/common";
+import { errorResponseSchema, messageResponseSchema } from "@/schemas/common";
 
 /**
  * Exercise を API レスポンス形式に変換

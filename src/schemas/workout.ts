@@ -38,7 +38,6 @@ export const workoutSchema = z.object({
   note: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  deletedAt: z.coerce.date().nullable(),
   workoutExercises: z.array(workoutExerciseSchema),
 });
 
@@ -47,7 +46,6 @@ export const workoutRequestSchema = workoutSchema
     id: true,
     createdAt: true,
     updatedAt: true,
-    deletedAt: true,
     workoutExercises: true,
   })
   .extend({

@@ -7,7 +7,7 @@ import { prisma } from "@/config/database";
 import { assertNotPreset, findExerciseForUser } from "./types";
 
 /**
- * Exerciseを論理削除する
+ * Exerciseを物理削除する
  * プリセット種目の場合は403エラーをスローする
  */
 export async function deleteExercise({
@@ -20,10 +20,7 @@ export async function deleteExercise({
   const exercise = await findExerciseForUser(exerciseId, userId);
   assertNotPreset(exercise, "delete");
 
-  await prisma.exercise.update({
+  await prisma.exercise.delete({
     where: { id: exerciseId },
-    data: {
-      deletedAt: new Date(),
-    },
   });
 }
