@@ -13,12 +13,12 @@ import { exerciseSchema } from "./exercise";
 export const workoutSetSchema = z.object({
   id: z.string(),
   // 筋トレ用
-  weight: z.number().int().min(0).nullable(),
+  weight: z.number().int().min(0).nullable(), // 重量（グラム）- フロント側で kg に変換
   reps: z.number().int().min(0).nullable(),
   // 有酸素用
   distance: z.number().int().min(0).nullable(), // 距離（メートル）
   duration: z.number().int().min(0).nullable(), // 時間（秒）
-  speed: z.number().min(0).nullable(), // 速さ（km/h）
+  speed: z.number().int().min(0).nullable(), // 速さ（0.1 km/h 単位）- 例: 10.5 km/h → 105
   calories: z.number().int().min(0).nullable(), // カロリー（kcal）
 });
 
@@ -31,13 +31,13 @@ export const workoutSetSchema = z.object({
 export const workoutSetRequestSchema = z.object({
   id: z.string().optional(),
   // 筋トレ用
-  weight: z.number().int().min(0).nullable().optional(),
+  weight: z.number().int().min(0).nullable().optional(), // 重量（グラム）
   reps: z.number().int().min(0).nullable().optional(),
   // 有酸素用
-  distance: z.number().int().min(0).nullable().optional(),
-  duration: z.number().int().min(0).nullable().optional(),
-  speed: z.number().min(0).nullable().optional(),
-  calories: z.number().int().min(0).nullable().optional(),
+  distance: z.number().int().min(0).nullable().optional(), // 距離（メートル）
+  duration: z.number().int().min(0).nullable().optional(), // 時間（秒）
+  speed: z.number().int().min(0).nullable().optional(), // 速さ（0.1 km/h 単位）
+  calories: z.number().int().min(0).nullable().optional(), // カロリー（kcal）
 });
 
 /**

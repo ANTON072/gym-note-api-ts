@@ -93,12 +93,12 @@ model WorkoutSet {
   id        String   @id @default(cuid())
   workoutId String   @map("workout_id")
   // 筋トレ用
-  weight    Int?
+  weight    Int?     // 重量（グラム）- フロント側で kg に変換
   reps      Int?
   // 有酸素用
   distance  Int?     // 距離（メートル）
   duration  Int?     // 時間（秒）
-  speed     Decimal? @db.Decimal(5, 2) // 速さ（km/h）
+  speed     Int?     // 速さ（0.1 km/h 単位）- 例: 10.5 km/h → 105
   calories  Int?     // カロリー（kcal）
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

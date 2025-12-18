@@ -4,7 +4,6 @@
  * メモとセットを差分更新
  */
 import { HTTPException } from "hono/http-exception";
-import { Decimal } from "@prisma/client/runtime/library";
 
 import { prisma } from "@/config/database";
 import type { WorkoutSetRequest } from "@/validators/training-session";
@@ -96,10 +95,7 @@ export async function updateWorkout({
             reps: set.reps ?? null,
             distance: set.distance ?? null,
             duration: set.duration ?? null,
-            speed:
-              set.speed !== undefined && set.speed !== null
-                ? new Decimal(set.speed)
-                : null,
+            speed: set.speed ?? null,
             calories: set.calories ?? null,
           },
         });
@@ -114,10 +110,7 @@ export async function updateWorkout({
             reps: set.reps ?? null,
             distance: set.distance ?? null,
             duration: set.duration ?? null,
-            speed:
-              set.speed !== undefined && set.speed !== null
-                ? new Decimal(set.speed)
-                : null,
+            speed: set.speed ?? null,
             calories: set.calories ?? null,
           })),
         });

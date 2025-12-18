@@ -78,7 +78,7 @@ trainingSessionRoutes.get(
             reps: set.reps,
             distance: set.distance,
             duration: set.duration,
-            speed: set.speed ? Number(set.speed) : null,
+            speed: set.speed,
             calories: set.calories,
           })),
         })),
