@@ -8,10 +8,3 @@ export const BodyPart = {
 } as const;
 
 export type BodyPart = (typeof BodyPart)[keyof typeof BodyPart];
-
-export const Laterality = {
-  BILATERAL: 0,
-  UNILATERAL: 1,
-} as const;
-
-export type Laterality = (typeof Laterality)[keyof typeof Laterality];

@@ -84,7 +84,6 @@ erDiagram
         boolean is_preset
         varchar name
         int body_part
-        int laterality
         datetime deleted_at
     }
 
@@ -146,7 +145,6 @@ erDiagram
 | is_preset  | BOOLEAN      | NOT NULL | プリセット種目フラグ（デフォルト: false） |
 | name       | VARCHAR(255) | NOT NULL | 種目名                                 |
 | body_part  | INTEGER      |          | 部位（enum: 胸、背中など）             |
-| laterality | INTEGER      |          | 左右区分（enum: 両側、片側）           |
 | deleted_at | DATETIME     |          | 論理削除日時                           |
 | created_at | DATETIME     | NOT NULL | 作成日時                               |
 | updated_at | DATETIME     | NOT NULL | 更新日時                               |
@@ -176,13 +174,6 @@ erDiagram
 | 3   | arms      | 腕   |
 | 4   | legs      | 脚   |
 | 5   | core      | 体幹 |
-
-#### laterality（左右区分）
-
-| 値  | 名前       | 説明                             |
-| --- | ---------- | -------------------------------- |
-| 0   | bilateral  | 両側（ベンチプレス、スクワット） |
-| 1   | unilateral | 片側（ダンベルカール等、左右別） |
 
 ---
 

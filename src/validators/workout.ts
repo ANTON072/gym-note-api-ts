@@ -19,7 +19,7 @@ export const workoutExerciseSchema = z.object({
 /**
  * エクササイズ指定スキーマ
  * - id のみ: 既存エクササイズを使用
- * - name, bodyPart, laterality: 新規エクササイズを作成
+ * - name, bodyPart: 新規エクササイズを作成
  */
 const existingExerciseSchema = z.object({ id: z.string() });
 const newExerciseSchema = exerciseRequestSchema;

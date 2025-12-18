@@ -11,7 +11,6 @@ export const mockExercise = {
   userId: TEST_USER_ID,
   name: "ベンチプレス",
   bodyPart: 1,
-  laterality: null,
   deletedAt: null,
   createdAt: new Date("2024-01-01T00:00:00Z"),
   updatedAt: new Date("2024-01-01T00:00:00Z"),
@@ -36,7 +35,6 @@ export const mockWorkoutWithRelations = {
         id: "exercise1",
         name: "ベンチプレス",
         bodyPart: 1,
-        laterality: null,
       },
       workoutSets: [
         { id: "ws1", weight: 60, reps: 10 },

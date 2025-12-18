@@ -43,7 +43,6 @@ describe("updateExercise", () => {
       exerciseData: {
         name: "ベンチプレス（ワイド）",
         bodyPart: 0,
-        laterality: null,
       },
     });
 
@@ -55,7 +54,6 @@ describe("updateExercise", () => {
       data: {
         name: "ベンチプレス（ワイド）",
         bodyPart: 0,
-        laterality: null,
       },
     });
     expect(result).toEqual(updatedExercise);
@@ -71,7 +69,6 @@ describe("updateExercise", () => {
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toMatchObject({
@@ -92,7 +89,6 @@ describe("updateExercise", () => {
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toMatchObject({
@@ -113,7 +109,6 @@ describe("updateExercise", () => {
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toMatchObject({
@@ -136,7 +131,6 @@ describe("updateExercise", () => {
         exerciseData: {
           name: "スクワット",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toMatchObject({
@@ -154,7 +148,6 @@ describe("updateExercise", () => {
         exerciseData: {
           name: "プリセットベンチプレス（編集）",
           bodyPart: 0,
-          laterality: 0,
         },
       })
     ).rejects.toMatchObject({

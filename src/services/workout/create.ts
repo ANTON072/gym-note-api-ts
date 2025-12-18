@@ -70,7 +70,6 @@ export async function createWorkout({
           userId,
           name: exerciseData.name,
           bodyPart: exerciseData.bodyPart,
-          laterality: exerciseData.laterality,
         },
       });
       exerciseIdMap.set(index, newExercise.id);

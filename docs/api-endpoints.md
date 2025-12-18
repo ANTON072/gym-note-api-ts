@@ -31,7 +31,6 @@
       "id": "cuid",
       "name": "ベンチプレス",
       "bodyPart": 0,
-      "laterality": 0,
       "isPreset": true,
       "createdAt": "2024-01-15T10:00:00.000Z",
       "updatedAt": "2024-01-15T10:00:00.000Z"
@@ -40,7 +39,6 @@
       "id": "cuid",
       "name": "オリジナル種目",
       "bodyPart": 0,
-      "laterality": 0,
       "isPreset": false,
       "createdAt": "2024-01-15T10:00:00.000Z",
       "updatedAt": "2024-01-15T10:00:00.000Z"
@@ -58,8 +56,7 @@
 ```json
 {
   "name": "オリジナル種目",
-  "bodyPart": 0,
-  "laterality": 0
+  "bodyPart": 0
 }
 ```
 
@@ -67,7 +64,6 @@
 | ---------- | ------ | ---- | ---------------------------------------------- |
 | name       | string | ○    | 種目名                                         |
 | bodyPart   | number | -    | 部位（0:胸, 1:背中, 2:肩, 3:腕, 4:脚, 5:体幹） |
-| laterality | number | -    | 左右区分（0:両側, 1:片側）                     |
 
 #### レスポンス
 
@@ -76,7 +72,6 @@
   "id": "cuid",
   "name": "オリジナル種目",
   "bodyPart": 0,
-  "laterality": 0,
   "isPreset": false,
   "createdAt": "2024-01-15T10:00:00.000Z",
   "updatedAt": "2024-01-15T10:00:00.000Z"
@@ -94,8 +89,7 @@
 ```json
 {
   "name": "オリジナル種目（改）",
-  "bodyPart": 0,
-  "laterality": 0
+  "bodyPart": 0
 }
 ```
 
@@ -106,7 +100,6 @@
   "id": "cuid",
   "name": "オリジナル種目（改）",
   "bodyPart": 0,
-  "laterality": 0,
   "isPreset": false,
   "createdAt": "2024-01-15T10:00:00.000Z",
   "updatedAt": "2024-01-15T11:00:00.000Z"
@@ -172,7 +165,6 @@
             "id": "cuid",
             "name": "ベンチプレス",
             "bodyPart": 0,
-            "laterality": 0,
             "isPreset": true
           },
           "workoutSets": [
@@ -221,8 +213,7 @@
       "exercise": {
         "id": "cuid",
         "name": "ベンチプレス",
-        "bodyPart": 0,
-        "laterality": 0
+        "bodyPart": 0
       },
       "workoutSets": [
         {
@@ -278,7 +269,7 @@
   "note": null,
   "workoutExercises": [
     {
-      "exercise": { "name": "懸垂", "bodyPart": 1, "laterality": 0 },
+      "exercise": { "name": "懸垂", "bodyPart": 1 },
       "orderIndex": 1,
       "workoutSets": [{ "weight": null, "reps": 10 }]
     }
@@ -297,7 +288,6 @@
 | workoutExercises[].exercise.id          | string           | -    | 既存種目のID               |
 | workoutExercises[].exercise.name        | string           | -    | 新規種目の名前             |
 | workoutExercises[].exercise.bodyPart    | number           | -    | 新規種目の部位             |
-| workoutExercises[].exercise.laterality  | number           | -    | 新規種目の左右区分         |
 | workoutExercises[].orderIndex           | number           | ○    | 表示順                     |
 | workoutExercises[].workoutSets          | array            | -    | セット一覧                 |
 | workoutExercises[].workoutSets[].weight | number           | -    | 重量（kg）                 |

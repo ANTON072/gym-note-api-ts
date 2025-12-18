@@ -54,8 +54,7 @@ content-type: application/json
 
 {
   "name": "Push Up",
-  "bodyPart": 0,
-  "laterality": 0
+  "bodyPart": 0
 }
 
 ###
@@ -67,8 +66,7 @@ content-type: application/json
 
 {
   "name": "Modified Push Up",
-  "bodyPart": 0,
-  "laterality": 0
+  "bodyPart": 0
 }
 
 ###
@@ -135,7 +133,7 @@ content-type: application/json
   "note": null,
   "workoutExercises": [
     {
-      "exercise": { "name": "懸垂（ワイドグリップ）", "bodyPart": 1, "laterality": 0 },
+      "exercise": { "name": "懸垂（ワイドグリップ）", "bodyPart": 1 },
       "orderIndex": 1,
       "workoutSets": [
         { "weight": null, "reps": 10 },
@@ -191,7 +189,7 @@ content-type: application/json
       ]
     },
     {
-      "exercise": { "name": "インクラインダンベルプレス", "bodyPart": 1, "laterality": 0 },
+      "exercise": { "name": "インクラインダンベルプレス", "bodyPart": 1 },
       "orderIndex": 2,
       "workoutSets": [
         { "weight": 20, "reps": 12 },

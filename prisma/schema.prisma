@@ -44,15 +44,14 @@ model Workout {
 }
 
 model Exercise {
-  id         String    @id @default(cuid())
-  userId     String?   @map("user_id") // プリセット種目の場合は NULL
-  isPreset   Boolean   @default(false) @map("is_preset")
-  name       String
-  bodyPart   Int?      @map("body_part")
-  laterality Int?      @map("laterality")
-  deletedAt  DateTime? @map("deleted_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  id        String    @id @default(cuid())
+  userId    String?   @map("user_id") // プリセット種目の場合は NULL
+  isPreset  Boolean   @default(false) @map("is_preset")
+  name      String
+  bodyPart  Int?      @map("body_part")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   user             User?             @relation(fields: [userId], references: [id])
   workoutExercises WorkoutExercise[]

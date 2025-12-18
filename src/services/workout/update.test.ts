@@ -154,7 +154,7 @@ describe("updateWorkout", () => {
         note: null,
         workoutExercises: [
           {
-            exercise: { name: "デッドリフト", bodyPart: 3, laterality: null },
+            exercise: { name: "デッドリフト", bodyPart: 3 },
             orderIndex: 1,
             workoutSets: [],
           },
@@ -167,7 +167,6 @@ describe("updateWorkout", () => {
         userId: TEST_USER_ID,
         name: "デッドリフト",
         bodyPart: 3,
-        laterality: null,
       },
     });
   });

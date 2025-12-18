@@ -36,9 +36,7 @@ export type FetchWorkoutsResult = {
  * エクササイズ指定が既存IDか新規作成かを判定
  */
 export function isExistingExercise(
-  exercise:
-    | { id: string }
-    | { name: string; bodyPart: number | null; laterality: number | null }
+  exercise: { id: string } | { name: string; bodyPart: number | null }
 ): exercise is { id: string } {
   return "id" in exercise;
 }

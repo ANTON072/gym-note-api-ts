@@ -112,7 +112,6 @@ describe("createWorkout", () => {
             id: "new-exercise1",
             name: "新種目",
             bodyPart: 2,
-            laterality: null,
           },
           workoutSets: [],
         },
@@ -131,7 +130,7 @@ describe("createWorkout", () => {
         note: null,
         workoutExercises: [
           {
-            exercise: { name: "新種目", bodyPart: 2, laterality: null },
+            exercise: { name: "新種目", bodyPart: 2 },
             orderIndex: 1,
             workoutSets: [],
           },
@@ -144,7 +143,6 @@ describe("createWorkout", () => {
         userId: TEST_USER_ID,
         name: "新種目",
         bodyPart: 2,
-        laterality: null,
       },
     });
 

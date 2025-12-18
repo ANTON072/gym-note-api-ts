@@ -31,7 +31,6 @@ describe("createExercise", () => {
       exerciseData: {
         name: "ベンチプレス",
         bodyPart: 1,
-        laterality: null,
       },
     });
 
@@ -40,7 +39,6 @@ describe("createExercise", () => {
         userId: TEST_USER_ID,
         name: "ベンチプレス",
         bodyPart: 1,
-        laterality: null,
       },
     });
     expect(result).toEqual(mockExercise);
@@ -59,7 +57,6 @@ describe("createExercise", () => {
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toMatchObject({
@@ -78,7 +75,6 @@ describe("createExercise", () => {
         exerciseData: {
           name: "ベンチプレス",
           bodyPart: 1,
-          laterality: null,
         },
       })
     ).rejects.toThrow("Database connection failed");
