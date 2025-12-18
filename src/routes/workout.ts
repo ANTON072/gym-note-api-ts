@@ -3,15 +3,19 @@
  * /api/v1/workouts
  * ワークアウトの更新（メモ + セット差分更新）
  */
-import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 
 import type { AuthEnv } from "@/types/hono";
 import { authMiddleware } from "@/middlewares/auth";
 import { updateWorkout } from "@/services/workout";
-import { workoutUpdateRequestSchema } from "@/validators/training-session";
+import {
+  workoutSchema,
+  workoutUpdateRequestSchema,
+  workoutIdParamSchema,
+} from "@/openapi/schemas/training-session";
+import { errorResponseSchema } from "@/openapi/schemas/common";
 
-const workoutRoutes = new Hono<AuthEnv>();
+const workoutRoutes = new OpenAPIHono<AuthEnv>();
 
 // 全ルートに認証を適用
 workoutRoutes.use("*", authMiddleware);
@@ -20,21 +24,72 @@ workoutRoutes.use("*", authMiddleware);
  * PUT /api/v1/workouts/:workoutId
  * ワークアウトを更新（メモ + セット差分更新）
  */
-workoutRoutes.put(
-  "/:workoutId",
-  zValidator("json", workoutUpdateRequestSchema),
-  async (c) => {
-    const user = c.get("user");
-    const workoutId = c.req.param("workoutId");
-    const data = c.req.valid("json");
+const updateWorkoutRoute = createRoute({
+  method: "put",
+  path: "/{workoutId}",
+  tags: ["Workout"],
+  summary: "ワークアウト更新",
+  description: "ワークアウトのメモとセットを更新する（セットは差分更新）",
+  security: [{ Bearer: [] }],
+  request: {
+    params: workoutIdParamSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: workoutUpdateRequestSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: workoutSchema,
+        },
+      },
+      description: "更新されたワークアウト",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+      description: "バリデーションエラー",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+      description: "認証エラー",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+      description: "ワークアウトが見つからない",
+    },
+  },
+});
 
-    const workout = await updateWorkout({
-      workoutId,
-      userId: user.id,
-      data,
-    });
+workoutRoutes.openapi(updateWorkoutRoute, async (c) => {
+  const user = c.get("user");
+  const { workoutId } = c.req.valid("param");
+  const data = c.req.valid("json");
 
-    return c.json({
+  const workout = await updateWorkout({
+    workoutId,
+    userId: user.id,
+    data,
+  });
+
+  return c.json(
+    {
       id: workout.id,
       orderIndex: workout.orderIndex,
       note: workout.note,
@@ -54,8 +109,9 @@ workoutRoutes.put(
         speed: set.speed,
         calories: set.calories,
       })),
-    });
-  }
-);
+    },
+    200
+  );
+});
 
 export { workoutRoutes };

@@ -14,7 +14,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
-    "firebase:start": "firebase emulators:start --only auth --project gym-note-app --import=./emulator-data --export-on-exit"
+    "firebase:start": "firebase emulators:start --only auth --project gym-note-app --import=./emulator-data --export-on-exit",
+    "openapi:generate": "tsx scripts/generate-openapi.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -24,6 +25,8 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.7",
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^1.1.5",
     "@hono/zod-validator": "^0.7.5",
     "@prisma/client": "^6.19.0",
     "dotenv": "^17.2.3",
@@ -42,6 +45,7 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
-    "vitest": "^4.0.13"
+    "vitest": "^4.0.13",
+    "yaml": "^2.8.2"
   }
 }

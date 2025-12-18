@@ -1,0 +1,905 @@
+openapi: 3.1.0
+info:
+  title: Gym Note API
+  version: 1.0.0
+  description: 筋トレのログを記録するノートアプリの API
+servers:
+  - url: http://localhost:3000
+    description: 開発環境
+tags:
+  - name: Health
+    description: ヘルスチェック
+  - name: Exercise
+    description: 種目の管理
+  - name: TrainingSession
+    description: トレーニングセッションの管理
+  - name: Workout
+    description: ワークアウトの管理
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase Auth のIDトークン
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        timestamp:
+          type: string
+          format: date-time
+          example: 2024-01-01T00:00:00.000Z
+      required:
+        - status
+        - timestamp
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clxyz123456789
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: ベンチプレス
+        bodyPart:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 5
+          description: 部位（0:胸, 1:背中, 2:肩, 3:腕, 4:脚, 5:腹）
+        exerciseType:
+          type: integer
+          minimum: 0
+          maximum: 1
+          description: 種類（0:筋トレ, 1:有酸素）
+        isPreset:
+          type: boolean
+          description: プリセット種目かどうか
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T00:00:00Z
+      required:
+        - id
+        - name
+        - bodyPart
+        - exerciseType
+        - isPreset
+        - createdAt
+        - updatedAt
+    ExerciseListResponse:
+      type: object
+      properties:
+        exercises:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exercise"
+      required:
+        - exercises
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    ExerciseDetailResponse:
+      type: object
+      properties:
+        exercise:
+          $ref: "#/components/schemas/Exercise"
+      required:
+        - exercise
+    ExerciseRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: ベンチプレス
+        bodyPart:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          maximum: 5
+          description: 部位（0:胸, 1:背中, 2:肩, 3:腕, 4:脚, 5:腹）
+        exerciseType:
+          type: integer
+          minimum: 0
+          maximum: 1
+          description: "種類（0:筋トレ, 1:有酸素）デフォルト: 0"
+      required:
+        - name
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    WorkoutExercise:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        bodyPart:
+          type:
+            - integer
+            - "null"
+        exerciseType:
+          type: integer
+        isPreset:
+          type: boolean
+      required:
+        - id
+        - name
+        - bodyPart
+        - exerciseType
+        - isPreset
+    WorkoutSet:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clxyz123456789
+        weight:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 重量（グラム）
+        reps:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 回数
+        distance:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 距離（メートル）
+        duration:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 時間（秒）
+        speed:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 速さ（0.1 km/h 単位）
+        calories:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: カロリー（kcal）
+      required:
+        - id
+        - weight
+        - reps
+        - distance
+        - duration
+        - speed
+        - calories
+    Workout:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clxyz123456789
+        orderIndex:
+          type: integer
+          minimum: 0
+        note:
+          type:
+            - string
+            - "null"
+        exercise:
+          $ref: "#/components/schemas/WorkoutExercise"
+        sets:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkoutSet"
+      required:
+        - id
+        - orderIndex
+        - note
+        - exercise
+        - sets
+    TrainingSession:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clxyz123456789
+        performedStartAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T09:00:00Z
+        performedEndAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+          example: 2024-01-01T10:30:00Z
+        place:
+          type:
+            - string
+            - "null"
+          example: ジム
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        workouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Workout"
+      required:
+        - id
+        - performedStartAt
+        - performedEndAt
+        - place
+        - createdAt
+        - updatedAt
+        - workouts
+    Paging:
+      type: object
+      properties:
+        total:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - total
+        - offset
+        - limit
+    TrainingSessionListResponse:
+      type: object
+      properties:
+        trainingSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrainingSession"
+        paging:
+          $ref: "#/components/schemas/Paging"
+      required:
+        - trainingSessions
+        - paging
+    TrainingSessionCreateRequest:
+      type: object
+      properties:
+        performedStartAt:
+          type: string
+          format: date-time
+          example: 2024-01-01T09:00:00Z
+      required:
+        - performedStartAt
+    TrainingSessionUpdateRequest:
+      type: object
+      properties:
+        performedStartAt:
+          type: string
+          format: date-time
+        performedEndAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        place:
+          type:
+            - string
+            - "null"
+    WorkoutAddRequest:
+      type: object
+      properties:
+        exerciseId:
+          type: string
+          example: clxyz123456789
+      required:
+        - exerciseId
+    WorkoutReorderRequest:
+      type: object
+      properties:
+        workoutIds:
+          type: array
+          items:
+            type: string
+      required:
+        - workoutIds
+    WorkoutSetRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 既存セットのID（更新時）
+        weight:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 重量（グラム）
+        reps:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 回数
+        distance:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 距離（メートル）
+        duration:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 時間（秒）
+        speed:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: 速さ（0.1 km/h 単位）
+        calories:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+          description: カロリー（kcal）
+    WorkoutUpdateRequest:
+      type: object
+      properties:
+        note:
+          type:
+            - string
+            - "null"
+        sets:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkoutSetRequest"
+  parameters: {}
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: ヘルスチェック
+      description: APIサーバーの稼働状況を確認する
+      responses:
+        "200":
+          description: サーバー稼働中
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /api/v1/exercises:
+    get:
+      tags:
+        - Exercise
+      summary: Exercise一覧を取得
+      description: ユーザーが登録したExercise一覧を取得する
+      security:
+        - Bearer: []
+      responses:
+        "200":
+          description: Exercise一覧
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseListResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - Exercise
+      summary: Exerciseを作成
+      description: 新しいExerciseを作成する
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciseRequest"
+      responses:
+        "201":
+          description: 作成されたExercise
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseDetailResponse"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: 重複エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/exercises/{exerciseId}:
+    get:
+      tags:
+        - Exercise
+      summary: Exercise詳細を取得
+      description: 指定IDのExercise詳細を取得する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: exerciseId
+          in: path
+      responses:
+        "200":
+          description: Exercise詳細
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseDetailResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Exerciseが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - Exercise
+      summary: Exerciseを更新
+      description: 指定IDのExerciseを更新する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: exerciseId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciseRequest"
+      responses:
+        "200":
+          description: 更新されたExercise
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseDetailResponse"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Exerciseが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: 重複エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Exercise
+      summary: Exerciseを削除
+      description: 指定IDのExerciseを削除する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: exerciseId
+          in: path
+      responses:
+        "200":
+          description: 削除完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Exerciseが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/training-sessions:
+    get:
+      tags:
+        - TrainingSession
+      summary: トレーニングセッション一覧取得
+      description: ユーザーのトレーニングセッション一覧をページングで取得する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type:
+              - integer
+              - "null"
+            minimum: 0
+          required: false
+          name: offset
+          in: query
+      responses:
+        "200":
+          description: トレーニングセッション一覧
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingSessionListResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - TrainingSession
+      summary: トレーニングセッション作成
+      description: 新しいトレーニングセッションを作成する
+      security:
+        - Bearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingSessionCreateRequest"
+      responses:
+        "201":
+          description: 作成されたトレーニングセッション
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingSession"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/training-sessions/{sessionId}:
+    get:
+      tags:
+        - TrainingSession
+      summary: トレーニングセッション詳細取得
+      description: 指定IDのトレーニングセッション詳細を取得する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+      responses:
+        "200":
+          description: トレーニングセッション詳細
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingSession"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - TrainingSession
+      summary: トレーニングセッション更新
+      description: 指定IDのトレーニングセッションを更新する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrainingSessionUpdateRequest"
+      responses:
+        "200":
+          description: 更新されたトレーニングセッション
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingSession"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - TrainingSession
+      summary: トレーニングセッション削除
+      description: 指定IDのトレーニングセッションを削除する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+      responses:
+        "204":
+          description: 削除完了
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/training-sessions/{sessionId}/workouts:
+    post:
+      tags:
+        - Workout
+      summary: ワークアウト追加
+      description: トレーニングセッションにワークアウトを追加する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutAddRequest"
+      responses:
+        "201":
+          description: 追加されたワークアウト
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションまたはExerciseが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/training-sessions/{sessionId}/workouts/reorder:
+    patch:
+      tags:
+        - Workout
+      summary: ワークアウト並び替え
+      description: トレーニングセッション内のワークアウトの順序を変更する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutReorderRequest"
+      responses:
+        "200":
+          description: 並び替え完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/training-sessions/{sessionId}/workouts/{workoutId}:
+    delete:
+      tags:
+        - Workout
+      summary: ワークアウト削除
+      description: トレーニングセッションからワークアウトを削除する
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: sessionId
+          in: path
+        - schema:
+            type: string
+          required: true
+          name: workoutId
+          in: path
+      responses:
+        "204":
+          description: 削除完了
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: セッションまたはワークアウトが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/workouts/{workoutId}:
+    put:
+      tags:
+        - Workout
+      summary: ワークアウト更新
+      description: ワークアウトのメモとセットを更新する（セットは差分更新）
+      security:
+        - Bearer: []
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: workoutId
+          in: path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkoutUpdateRequest"
+      responses:
+        "200":
+          description: 更新されたワークアウト
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+        "400":
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: ワークアウトが見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+webhooks: {}
