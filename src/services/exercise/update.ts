@@ -24,14 +24,28 @@ export async function updateExercise({
   userId: string;
   exerciseData: ExerciseRequest;
 }): Promise<Exercise> {
-  const exercise = await findExerciseForUser(exerciseId, userId);
-  assertNotPreset(exercise, "edit");
+  const existing = await findExerciseForUser(exerciseId, userId);
+  assertNotPreset(existing, "edit");
 
   try {
-    return await prisma.exercise.update({
+    const exercise = await prisma.exercise.update({
       where: { id: exerciseId },
-      data: exerciseData,
+      data: {
+        name: exerciseData.name,
+        bodyPart: exerciseData.bodyPart ?? null,
+        exerciseType: exerciseData.exerciseType ?? existing.exerciseType,
+      },
     });
+
+    return {
+      id: exercise.id,
+      name: exercise.name,
+      bodyPart: exercise.bodyPart,
+      exerciseType: exercise.exerciseType,
+      isPreset: exercise.isPreset,
+      createdAt: exercise.createdAt,
+      updatedAt: exercise.updatedAt,
+    };
   } catch (error) {
     handleUniqueConstraintError(error);
   }

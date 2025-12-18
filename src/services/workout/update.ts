@@ -1,128 +1,149 @@
 /**
  * ワークアウト更新サービス
+ * PUT /api/v1/workouts/:workoutId
+ * メモとセットを差分更新
  */
 import { HTTPException } from "hono/http-exception";
+import { Decimal } from "@prisma/client/runtime/library";
 
 import { prisma } from "@/config/database";
-import type { WorkoutRequest } from "@/validators/workout";
+import type { WorkoutSetRequest } from "@/validators/training-session";
 
-import {
-  workoutWithRelations,
-  WorkoutWithRelations,
-  isExistingExercise,
-} from "./types";
+import { workoutWithRelations, WorkoutWithRelations } from "./types";
 
 /**
- * ワークアウトを更新する
- * 既存のWorkoutExercisesは削除して再作成する
+ * ワークアウトを更新する（メモとセットの差分更新）
+ * - sets[].id有り → 更新
+ * - sets[].id無し → 新規作成
+ * - リクエストに無いID → 削除
  */
 export async function updateWorkout({
   workoutId,
   userId,
-  workoutData,
+  data,
 }: {
   workoutId: string;
   userId: string;
-  workoutData: WorkoutRequest;
+  data: {
+    note?: string | null;
+    sets?: WorkoutSetRequest[];
+  };
 }): Promise<WorkoutWithRelations> {
   // 既存のワークアウトを取得して権限を確認
   const existingWorkout = await prisma.workout.findUnique({
     where: { id: workoutId },
-    include: workoutWithRelations,
+    include: {
+      trainingSession: true,
+      workoutSets: true,
+    },
   });
 
+  if (!existingWorkout) {
+    throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
+  }
+
+  // トレーニングセッションのオーナーを確認
   if (
-    !existingWorkout ||
-    existingWorkout.userId !== userId ||
-    existingWorkout.deletedAt !== null
+    existingWorkout.trainingSession.userId !== userId ||
+    existingWorkout.trainingSession.deletedAt !== null
   ) {
     throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 
-  const { workoutExercises, ...workoutFields } = workoutData;
+  // メモの更新データを準備
+  const updateData: { note?: string | null } = {};
+  if (data.note !== undefined) {
+    updateData.note = data.note;
+  }
 
-  // 既存のworkoutExercisesを削除（カスケードでworkoutSetsも削除される）
-  await prisma.workoutExercise.deleteMany({
-    where: { workoutId },
-  });
-
-  // 既存エクササイズと新規エクササイズを分離
-  const existingExerciseIds: string[] = [];
-  const newExerciseIndices: number[] = [];
-
-  workoutExercises.forEach((we, index) => {
-    if (isExistingExercise(we.exercise)) {
-      existingExerciseIds.push(we.exercise.id);
-    } else {
-      newExerciseIndices.push(index);
-    }
-  });
-
-  // 既存エクササイズIDの検証
-  if (existingExerciseIds.length > 0) {
-    const validExercises = await prisma.exercise.findMany({
-      where: {
-        id: { in: existingExerciseIds },
-        userId,
-        deletedAt: null,
-      },
-    });
-
-    const validExerciseIds = new Set(validExercises.map((e) => e.id));
-    const invalidIds = existingExerciseIds.filter(
-      (id) => !validExerciseIds.has(id)
+  // セットの差分更新
+  if (data.sets !== undefined) {
+    const existingSetIds = new Set(
+      existingWorkout.workoutSets.map((s) => s.id)
+    );
+    const requestSetIds = new Set(
+      data.sets.filter((s) => s.id).map((s) => s.id!)
     );
 
-    if (invalidIds.length > 0) {
-      throw new HTTPException(400, {
-        message: `無効なエクササイズIDが含まれています: ${invalidIds.join(", ")}`,
-      });
-    }
+    // 削除対象: リクエストにないID
+    const setsToDelete = [...existingSetIds].filter(
+      (id) => !requestSetIds.has(id)
+    );
+
+    // 更新対象: IDがあるセット
+    const setsToUpdate = data.sets.filter(
+      (s) => s.id && existingSetIds.has(s.id)
+    );
+
+    // 新規作成対象: IDがないセット
+    const setsToCreate = data.sets.filter((s) => !s.id);
+
+    // トランザクションで処理
+    await prisma.$transaction(async (tx) => {
+      // 削除
+      if (setsToDelete.length > 0) {
+        await tx.workoutSet.deleteMany({
+          where: { id: { in: setsToDelete } },
+        });
+      }
+
+      // 更新
+      for (const set of setsToUpdate) {
+        await tx.workoutSet.update({
+          where: { id: set.id },
+          data: {
+            weight: set.weight ?? null,
+            reps: set.reps ?? null,
+            distance: set.distance ?? null,
+            duration: set.duration ?? null,
+            speed:
+              set.speed !== undefined && set.speed !== null
+                ? new Decimal(set.speed)
+                : null,
+            calories: set.calories ?? null,
+          },
+        });
+      }
+
+      // 新規作成
+      if (setsToCreate.length > 0) {
+        await tx.workoutSet.createMany({
+          data: setsToCreate.map((set) => ({
+            workoutId,
+            weight: set.weight ?? null,
+            reps: set.reps ?? null,
+            distance: set.distance ?? null,
+            duration: set.duration ?? null,
+            speed:
+              set.speed !== undefined && set.speed !== null
+                ? new Decimal(set.speed)
+                : null,
+            calories: set.calories ?? null,
+          })),
+        });
+      }
+
+      // メモを更新
+      if (Object.keys(updateData).length > 0) {
+        await tx.workout.update({
+          where: { id: workoutId },
+          data: updateData,
+        });
+      }
+    });
+  } else if (Object.keys(updateData).length > 0) {
+    // セットの更新がない場合はメモのみ更新
+    await prisma.workout.update({
+      where: { id: workoutId },
+      data: updateData,
+    });
   }
 
-  // 新規エクササイズを作成し、IDを取得
-  const exerciseIdMap = new Map<number, string>();
-
-  for (const index of newExerciseIndices) {
-    const exerciseData = workoutExercises[index].exercise;
-    if (!isExistingExercise(exerciseData)) {
-      const newExercise = await prisma.exercise.create({
-        data: {
-          userId,
-          name: exerciseData.name,
-          bodyPart: exerciseData.bodyPart,
-        },
-      });
-      exerciseIdMap.set(index, newExercise.id);
-    }
-  }
-
-  // ワークアウトを更新（関連データも再作成）
-  const workout = await prisma.workout.update({
+  // 更新後のデータを返す
+  const workout = await prisma.workout.findUnique({
     where: { id: workoutId },
-    data: {
-      ...workoutFields,
-      workoutExercises: {
-        create: workoutExercises.map((we, index) => {
-          const exerciseId = isExistingExercise(we.exercise)
-            ? we.exercise.id
-            : exerciseIdMap.get(index)!;
-
-          return {
-            exerciseId,
-            orderIndex: we.orderIndex,
-            workoutSets: {
-              create: we.workoutSets.map((ws) => ({
-                weight: ws.weight,
-                reps: ws.reps,
-              })),
-            },
-          };
-        }),
-      },
-    },
     include: workoutWithRelations,
   });
 
-  return workout;
+  return workout!;
 }

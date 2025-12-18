@@ -39,9 +39,19 @@ describe("createExercise", () => {
         userId: TEST_USER_ID,
         name: "ベンチプレス",
         bodyPart: 1,
+        exerciseType: 0, // デフォルト: 筋トレ
+        isPreset: false, // カスタム種目
       },
     });
-    expect(result).toEqual(mockExercise);
+    expect(result).toEqual({
+      id: mockExercise.id,
+      name: mockExercise.name,
+      bodyPart: mockExercise.bodyPart,
+      exerciseType: mockExercise.exerciseType,
+      isPreset: mockExercise.isPreset,
+      createdAt: mockExercise.createdAt,
+      updatedAt: mockExercise.updatedAt,
+    });
   });
 
   it("同じ名前のエクササイズが存在する場合、CONFLICTエラーをスローする", async () => {

@@ -1,104 +1,81 @@
 /**
- * ワークアウト作成サービス
+ * ワークアウト追加サービス
+ * POST /api/v1/training-sessions/:sessionId/workouts
  */
 import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
-import type { WorkoutRequest } from "@/validators/workout";
 
-import {
-  workoutWithRelations,
-  WorkoutWithRelations,
-  isExistingExercise,
-} from "./types";
+import { workoutWithRelations, WorkoutWithRelations } from "./types";
 
 /**
- * ワークアウトを作成する
- * WorkoutExercises と WorkoutSets も同時に作成
+ * トレーニングセッションにワークアウトを追加する
+ * orderIndex はサーバー側で自動採番（末尾に追加）
  */
-export async function createWorkout({
+export async function addWorkout({
+  sessionId,
   userId,
-  workoutData,
+  exerciseId,
 }: {
+  sessionId: string;
   userId: string;
-  workoutData: WorkoutRequest;
+  exerciseId: string;
 }): Promise<WorkoutWithRelations> {
-  const { workoutExercises, ...workoutFields } = workoutData;
-
-  // 既存エクササイズと新規エクササイズを分離
-  const existingExerciseIds: string[] = [];
-  const newExerciseIndices: number[] = [];
-
-  workoutExercises.forEach((we, index) => {
-    if (isExistingExercise(we.exercise)) {
-      existingExerciseIds.push(we.exercise.id);
-    } else {
-      newExerciseIndices.push(index);
-    }
+  // トレーニングセッションの存在確認とオーナー確認
+  const session = await prisma.trainingSession.findUnique({
+    where: { id: sessionId },
   });
 
-  // 既存エクササイズIDの検証
-  if (existingExerciseIds.length > 0) {
-    const validExercises = await prisma.exercise.findMany({
-      where: {
-        id: { in: existingExerciseIds },
-        userId,
-        deletedAt: null,
-      },
+  if (!session || session.userId !== userId || session.deletedAt !== null) {
+    throw new HTTPException(404, {
+      message: "トレーニングセッションが見つかりません",
     });
-
-    const validExerciseIds = new Set(validExercises.map((e) => e.id));
-    const invalidIds = existingExerciseIds.filter(
-      (id) => !validExerciseIds.has(id)
-    );
-
-    if (invalidIds.length > 0) {
-      throw new HTTPException(400, {
-        message: `無効なエクササイズIDが含まれています: ${invalidIds.join(", ")}`,
-      });
-    }
   }
 
-  // 新規エクササイズを作成し、IDを取得
-  const exerciseIdMap = new Map<number, string>();
+  // 種目の存在確認（プリセットまたは自分の種目）
+  const exercise = await prisma.exercise.findUnique({
+    where: { id: exerciseId },
+  });
 
-  for (const index of newExerciseIndices) {
-    const exerciseData = workoutExercises[index].exercise;
-    if (!isExistingExercise(exerciseData)) {
-      const newExercise = await prisma.exercise.create({
-        data: {
-          userId,
-          name: exerciseData.name,
-          bodyPart: exerciseData.bodyPart,
-        },
-      });
-      exerciseIdMap.set(index, newExercise.id);
-    }
+  if (!exercise || exercise.deletedAt !== null) {
+    throw new HTTPException(404, { message: "種目が見つかりません" });
   }
 
-  // ワークアウトとその関連データを一括作成
+  // プリセットでない場合は自分の種目か確認
+  if (!exercise.isPreset && exercise.userId !== userId) {
+    throw new HTTPException(403, { message: "この種目は使用できません" });
+  }
+
+  // 同じセッションに同じ種目がすでに存在するか確認
+  const existingWorkout = await prisma.workout.findUnique({
+    where: {
+      trainingSessionId_exerciseId: {
+        trainingSessionId: sessionId,
+        exerciseId,
+      },
+    },
+  });
+
+  if (existingWorkout) {
+    throw new HTTPException(409, {
+      message: "この種目はすでに追加されています",
+    });
+  }
+
+  // 現在の最大 orderIndex を取得
+  const maxOrderIndex = await prisma.workout.aggregate({
+    where: { trainingSessionId: sessionId },
+    _max: { orderIndex: true },
+  });
+
+  const nextOrderIndex = (maxOrderIndex._max.orderIndex ?? -1) + 1;
+
+  // ワークアウトを作成
   const workout = await prisma.workout.create({
     data: {
-      userId,
-      ...workoutFields,
-      workoutExercises: {
-        create: workoutExercises.map((we, index) => {
-          const exerciseId = isExistingExercise(we.exercise)
-            ? we.exercise.id
-            : exerciseIdMap.get(index)!;
-
-          return {
-            exerciseId,
-            orderIndex: we.orderIndex,
-            workoutSets: {
-              create: we.workoutSets.map((ws) => ({
-                weight: ws.weight,
-                reps: ws.reps,
-              })),
-            },
-          };
-        }),
-      },
+      trainingSessionId: sessionId,
+      exerciseId,
+      orderIndex: nextOrderIndex,
     },
     include: workoutWithRelations,
   });

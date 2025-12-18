@@ -1,39 +1,46 @@
 /**
  * ワークアウト削除サービス
+ * DELETE /api/v1/training-sessions/:sessionId/workouts/:workoutId
  */
 import { HTTPException } from "hono/http-exception";
 
 import { prisma } from "@/config/database";
 
 /**
- * ワークアウトを論理削除する
- * deletedAtに現在時刻を設定
+ * ワークアウトを削除する（物理削除）
+ * セットはカスケード削除される
  */
 export async function deleteWorkout({
+  sessionId,
   workoutId,
   userId,
 }: {
+  sessionId: string;
   workoutId: string;
   userId: string;
 }): Promise<void> {
-  // 既存のワークアウトを取得して権限を確認
-  const existingWorkout = await prisma.workout.findUnique({
+  // トレーニングセッションの存在確認とオーナー確認
+  const session = await prisma.trainingSession.findUnique({
+    where: { id: sessionId },
+  });
+
+  if (!session || session.userId !== userId || session.deletedAt !== null) {
+    throw new HTTPException(404, {
+      message: "トレーニングセッションが見つかりません",
+    });
+  }
+
+  // ワークアウトの存在確認
+  const workout = await prisma.workout.findUnique({
     where: { id: workoutId },
   });
 
-  if (
-    !existingWorkout ||
-    existingWorkout.userId !== userId ||
-    existingWorkout.deletedAt !== null
-  ) {
+  if (!workout || workout.trainingSessionId !== sessionId) {
     throw new HTTPException(404, { message: "ワークアウトが見つかりません" });
   }
 
-  // 論理削除（deletedAtを設定）
-  await prisma.workout.update({
+  // 物理削除（カスケードでセットも削除される）
+  await prisma.workout.delete({
     where: { id: workoutId },
-    data: {
-      deletedAt: new Date(),
-    },
   });
 }

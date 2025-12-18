@@ -54,9 +54,18 @@ describe("updateExercise", () => {
       data: {
         name: "ベンチプレス（ワイド）",
         bodyPart: 0,
+        exerciseType: mockExercise.exerciseType,
       },
     });
-    expect(result).toEqual(updatedExercise);
+    expect(result).toEqual({
+      id: updatedExercise.id,
+      name: updatedExercise.name,
+      bodyPart: updatedExercise.bodyPart,
+      exerciseType: updatedExercise.exerciseType,
+      isPreset: updatedExercise.isPreset,
+      createdAt: updatedExercise.createdAt,
+      updatedAt: updatedExercise.updatedAt,
+    });
   });
 
   it("存在しないエクササイズの場合、NOT_FOUNDエラーをスローする", async () => {

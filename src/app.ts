@@ -8,7 +8,8 @@ import { secureHeaders } from "hono/secure-headers";
 
 import health from "./routes/health";
 import exercise from "./routes/exercise";
-import workout from "./routes/workout";
+import { trainingSessionRoutes } from "./routes/training-session";
+import { workoutRoutes } from "./routes/workout";
 
 const app = new Hono();
 
@@ -19,6 +20,7 @@ app.use("*", cors());
 // ルート
 app.route("/health", health);
 app.route("/api/v1/exercises", exercise);
-app.route("/api/v1/workouts", workout);
+app.route("/api/v1/training-sessions", trainingSessionRoutes);
+app.route("/api/v1/workouts", workoutRoutes);
 
 export default app;

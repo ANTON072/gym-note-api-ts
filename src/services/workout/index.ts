@@ -1,13 +1,14 @@
 /**
  * ワークアウトサービス
- * トレーニング記録の作成・取得・更新・削除
+ * TrainingSession 内の種目ごとの実施記録
  */
 
 // 型のエクスポート
-export type { WorkoutWithRelations, FetchWorkoutsResult } from "./types";
+export type { WorkoutWithRelations } from "./types";
 
 // 関数のエクスポート
-export { createWorkout } from "./create";
-export { fetchWorkouts, fetchWorkoutById } from "./fetch";
+export { addWorkout } from "./create";
+export { fetchWorkoutById } from "./fetch";
 export { updateWorkout } from "./update";
 export { deleteWorkout } from "./delete";
+export { reorderWorkouts } from "./reorder";
