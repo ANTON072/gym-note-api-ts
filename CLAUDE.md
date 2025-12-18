@@ -14,10 +14,8 @@
 - **データベース:** MariaDB
 - **ORM:** Prisma
 - **バリデーション・OpenAPI:** @hono/zod-openapi
-
-## 認証システム
-
-- **プロバイダー:** Firebase Auth
+- **認証:** Firebase Auth
+- **テスト:** Vitest
 
 ## プロジェクト構造
 
@@ -35,12 +33,6 @@ gym-note-api-ts/
     ├── services/        # ビジネスロジック
     └── types/           # 型定義
 ```
-
-### サービスのファイル構成
-
-- **小規模なサービス:** 単一ファイル（例: `services/user.ts`）
-- **大規模なサービス:** ディレクトリに分割（例: `services/exercise/`）
-  - `index.ts` で関数をre-exportし、インポート側は `@/services/exercise` で統一
 
 ## 利用可能なコマンド
 
@@ -63,77 +55,28 @@ gym-note-api-ts/
 3. `npm run prisma:migrate`でマイグレーション実行
 4. `npm run dev`で開発サーバー起動
 
-## コード生成規約
+## 基本規約
 
 - **言語:** TypeScript
+- **コメント:** 各ファイルの冒頭に日本語で仕様を記述
+- **ドキュメント:** 関数には JSDoc コメントを必ず追加
+- **ハードコード禁止:** 環境変数や設定ファイルを利用
+- **テスト必須:** 各サービス関数に対してユニットテストを実装
+- **コード変更後:** `npm run test` がパスすることを常に確認
 
-### Prisma 命名規則
-
-- **モデル名:** PascalCase 単数形（例: `User`, `Workout`）
-- **フィールド名:** camelCase（例: `firebaseUid`, `createdAt`）
-- **DBテーブル名:** snake_case 複数形（例: `users`, `workouts`）→ `@@map("テーブル名")` で指定
-- **DBカラム名:** snake_case（例: `firebase_uid`, `created_at`）→ `@map("カラム名")` で指定
-
-```prisma
-model User {
-  id          String   @id @default(cuid())
-  firebaseUid String   @unique @map("firebase_uid")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("users")
-}
-```
-
-### Enum の扱い
-
-- Prisma enum は使わず、`Int` 型で数値として保存する
-- TypeScript 側で enum を定義して変換・管理する
-
-### Zod スキーマ
-
-- `@hono/zod-openapi` の `z` を使用する
-- datetime は `z.iso.datetime()` を使用する
-
-### コメント
-
-- 各ファイルの冒頭には日本語のコメントで仕様を記述する
-
-### Routes / Service の命名規則
-
-- **Service 関数:** シンプルな名前を使用（例: `fetchExercises`, `createExercise`）
-- **Routes:** ルートとハンドラーを統合（Hono推奨スタイル）
-
-### レイヤーの責務
-
-| レイヤー | 責務                                        |
-| -------- | ------------------------------------------- |
-| Routes   | ルート定義、ハンドラー、バリデーション      |
-| Service  | ビジネスロジック、DB 操作、外部サービス連携 |
-
-- **バリデーション:** Routes で `@hono/zod-openapi` の `createRoute` を使用
-- **ビジネスルールの検証:** Service で実施（重複チェック、権限、整合性など）
-- **エラーハンドリング:** Service で `HTTPException` をスロー
-
-### 認証ミドルウェア
+## 認証ミドルウェア
 
 - `c.get("decodedToken")`: Firebase の DecodedIdToken（JWT の中身）
 - `c.get("user")`: DB の User オブジェクト（認証ミドルウェアで取得済み）
-- ルートハンドラーでは `c.get("user")` から直接ユーザー情報を取得する
-
-### テスト
-
-- **テスト対象:** Service 層のみ（Routes 層のテストは不要）
-- 各機能に対しては必ずユニットテストを実装（テストは Vitest を使用。describe/it 構文を使用。describe は日本語で記述）
-- コードを追加で修正したとき、 `npm run test` がパスすることを常に確認する。
-- **コードスタイル:** ESLint + Prettier
-- **ドキュメント:** 関数には JSDoc コメントを必ず追加
-- 規約: ハードコード禁止。環境変数や設定ファイルを利用し、柔軟に対応できるようにします。
 
 ## ドキュメント
 
 - [DB テーブル設計](docs/db-table-structure.md)
 - [OpenAPI 仕様](docs/openapi.yaml)
+
+## スキル（Claude Code用）
+
+- [機能追加スキル](.claude/skills/add-feature.md) - 新しいAPIエンドポイントを追加する際の手順・テンプレート・命名規則
 
 ## 参考リンク
 
